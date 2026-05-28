@@ -35,7 +35,7 @@ public class UserRedmineCredential {
     @JoinColumn(name = "redmine_instance_id")
     private RedmineInstance redmineInstance;
 
-    @Column(nullable = false, name = "api_key")
+    @Column(name = "api_key")
     private String apiKey;
 
     @Column(name = "last_sync_at")

@@ -6,9 +6,11 @@ import com.estimplytics.backend.dto.RequestUpdateDTO;
 import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.RequestNotFoundException;
 import com.estimplytics.backend.mapper.RequestMapper;
+import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
 import com.estimplytics.backend.repository.RequestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +22,18 @@ public class RequestService implements IRequestService {
 
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
+    private final RedmineIssueMetadataRepository redmineMetadataRepository;
 
-    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper) {
+    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, RedmineIssueMetadataRepository redmineMetadataRepository) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
+        this.redmineMetadataRepository = redmineMetadataRepository;
+    }
+
+    private void rejectIfRedmineSourced(UUID id) {
+        if (redmineMetadataRepository.findByRequestId(id).isPresent()) {
+            throw new AccessDeniedException("Redmine requests cannot be modified or deleted");
+        }
     }
 
     @Override
@@ -47,6 +57,7 @@ public class RequestService implements IRequestService {
     @Override
     @Transactional
     public RequestResponseDTO update(UUID id, RequestUpdateDTO dto) {
+        rejectIfRedmineSourced(id);
         return requestRepository.findById(id).map(entity -> {
             requestMapper.updateEntityFromDTO(dto, entity);
             return requestMapper.toResponseDTO(requestRepository.save(entity));
@@ -56,6 +67,7 @@ public class RequestService implements IRequestService {
     @Override
     @Transactional
     public void delete(UUID id) {
+        rejectIfRedmineSourced(id);
         if (!requestRepository.existsById(id)) {
             throw new RequestNotFoundException("Request not found with id %s".formatted(id));
         }

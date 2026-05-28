@@ -45,11 +45,27 @@ public class RedmineIntegrationService {
         this.redmineIssueMapper = redmineIssueMapper;
     }
 
+    public String testConnection(UserRedmineCredential credential) {
+        String base = credential.getRedmineInstance().getBaseUrl().replaceAll("/+$", "");
+        try {
+            var spec = restClient.get().uri(base);
+            String key = credential.getApiKey();
+
+            if (key != null && !key.isBlank()) spec = spec.header("X-Redmine-API-Key", key);
+            
+            spec.retrieve().toBodilessEntity();
+            return "connected";
+        } catch (HttpClientErrorException e) {
+            int code = e.getStatusCode().value();
+            return (code == 401 || code == 403) ? "unauthorized" : "unreachable";
+        } catch (Exception e) {
+            return "unreachable";
+        }
+    }
+
     @Transactional
     public int syncIssuesFromRedmine(Long credentialId) {
-        UserRedmineCredential credential = userRedmineCredentialRepository.findById(credentialId)
-                .orElseThrow(() -> new RedmineCredentialNotFoundException(
-                        "Redmine credential not found with id %s".formatted(credentialId)));
+        UserRedmineCredential credential = userRedmineCredentialRepository.findById(credentialId).orElseThrow(() -> new RedmineCredentialNotFoundException("Redmine credential not found with id %s".formatted(credentialId)));
 
         int offset = 0;
         int limit = 100;
