@@ -1,0 +1,11 @@
+@if (route()) {
+  <a class="sidebar-nav-item" [routerLink]="route()!" routerLinkActive="sidebar-nav-item--active" [routerLinkActiveOptions]="{ exact: exact() }">
+    <span class="sidebar-nav-item__icon" [feather]="icon()" aria-hidden="true"></span>
+    <p class="sidebar-nav-item__label">{{ label() }}</p>
+  </a>
+} @else {
+  <button class="sidebar-nav-item" type="button" (click)="handleClick()">
+    <span class="sidebar-nav-item__icon" [feather]="icon()" aria-hidden="true"></span>
+    <p class="sidebar-nav-item__label">{{ label() }}</p>
+  </button>
+}
