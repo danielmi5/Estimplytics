@@ -10,7 +10,7 @@ import { FeatherIconDirective } from '../../../directives/feather-icon.directive
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Button {
-  readonly variant = input.required<'primary' | 'secondary' | 'ghost' | 'light'>();
+  readonly variant = input.required<'primary' | 'secondary' | 'ghost'>();
   readonly label = input.required<string>();
   readonly size = input<'sm' | 'md' | 'lg'>('md');
   readonly buttonType = input<'button' | 'submit' | 'reset'>('button');

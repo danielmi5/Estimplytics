@@ -1,6 +1,6 @@
-<app-header></app-header>
+<app-header (scrolledChange)="isScrolled = $event"></app-header>
 
-<main class="app-main">
+<main class="app-main" [class.app-main--scrolled]="isScrolled">
   <router-outlet></router-outlet>
 </main>
 

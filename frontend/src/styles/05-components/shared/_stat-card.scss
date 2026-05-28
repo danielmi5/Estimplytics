@@ -18,9 +18,7 @@
         }
 
         strong {
-            color: var(--text);
-            font-family: var(--font-secondary);
-            font-size: var(--font-size-lg);
+            @include mixins.typography(h6);
         }
     }
 
@@ -72,12 +70,7 @@
 
     strong {
         display: block;
-
-        color: var(--text);
-
-        font-family: var(--font-secondary);
-        font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-700);
+        @include mixins.typography(h5);
     }
 
     span {

@@ -14,11 +14,8 @@
     }
 
     &__title {
-        margin: 0;
-        color: var(--text);
-        font-family: var(--font-secondary);
+        @include mixins.typography(h3);
         font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-        font-weight: var(--font-weight-700);
     }
 
     &__subtitle {

@@ -2,16 +2,13 @@
 @use "../01-tools/mixins" as mixins;
 
 .header {
-  height: 5rem;
+  width: 100%;
+  height: 6.75rem;
   
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   z-index: 1000;
 
   background-color: var(--bg-header);
-  border-bottom: var(--border-thin) solid var(--border);
 
   transition: height var(--transition-base) ease, box-shadow var(--transition-base) ease;
 
@@ -43,10 +40,7 @@
     }
 
     &-content {
-      font-family: var(--font-secondary);
-      font-size: var(--font-size-xl);
-      font-weight: var(--font-weight-700);
-      color: var(--card-important);
+      @include mixins.typography(h5, var(--card-important));
     }
   }
 
@@ -57,16 +51,14 @@
 
   &__nav-link {
     padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
 
     display: flex;
     align-items: center;
-    
-    
-    font-family: var(--font-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-500);
-    color: var(--card-label);
+
+    border-radius: var(--radius-md);
+
+    @include mixins.typography(h6, var(--text-important));
+
     text-decoration: none;
     transition: color var(--transition-fast) ease, background-color var(--transition-fast) ease;
 
@@ -87,6 +79,8 @@
 
   &__actions {
     @include mixins.flex(row, var(--spacing-md), flex-start, center);
+    position: relative;
+    z-index: 1;
   }
 
   &__avatar {
@@ -97,26 +91,14 @@
     @include mixins.flex-center();
 
     background-color: var(--button-primary-default);
-    color: var(--text-dark);
-    font-family: var(--font-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-600);
     border: none;
+    text-decoration: none;
+
+    @include mixins.typography(h6, var(--text-dark));
 
     cursor: pointer;
     transition: transform var(--transition-fast) ease;
 
-    &:hover {
-      transform: scale(1.06);
-    }
-
-    &:focus-visible {
-      outline: var(--border-medium) solid var(--text-important);
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
   }
 
   &__menu {
@@ -216,10 +198,14 @@
       
       transform: translateY(-110%);
       opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
 
       &--open {
         transform: translateY(0);
         opacity: 1;
+        pointer-events: auto;
+        visibility: visible;
       }
     }
 
@@ -246,8 +232,6 @@
   }
 
   @media (max-width: 280px) {
-    height: auto;
-    min-height: 5.3em;
 
     &--scrolled {
       height: auto;
@@ -256,6 +240,7 @@
 
     &__container{
       flex-direction: column;
+      justify-content: center;
     }
   }
 }

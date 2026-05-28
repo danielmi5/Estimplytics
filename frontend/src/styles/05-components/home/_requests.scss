@@ -14,11 +14,8 @@
     }
 
     &__title {
-        margin: 0;
-        color: var(--text);
-        font-family: var(--font-secondary);
+        @include mixins.typography(h3);
         font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-        font-weight: var(--font-weight-700);
     }
 
     &__subtitle {
@@ -28,8 +25,7 @@
 
     &__link {
         @include mixins.flex(row, var(--spacing-sm), flex-start, center);
-        color: var(--text-important);
-        font-size: var(--font-size-sm);
+        @include mixins.typography(small, var(--text-important));
         font-weight: var(--font-weight-600);
         text-decoration: none;
         line-height: 1;
@@ -60,8 +56,7 @@
         th {
             padding: var(--spacing-md) var(--spacing-lg);
             border-bottom: 1px solid var(--border);
-            color: var(--card-label);
-            font-size: var(--font-size-xs);
+            @include mixins.typography(mini, var(--card-label));
             font-weight: var(--font-weight-700);
             letter-spacing: 0.07em;
             text-align: center;
@@ -86,9 +81,8 @@
     }
 
     &__table &__ticket {
-        color: var(--text-important);
-        font-family: var(--font-secondary);
-        font-weight: var(--font-weight-700);
+        @include mixins.typography(h6, var(--text-important));
+        font-size: inherit;
     }
 
     &__table &__title {
@@ -102,8 +96,7 @@
         padding: var(--spacing-xs) var(--spacing-sm);
         border-radius: var(--radius-full);
         background: var(--bg);
-        color: var(--card-label);
-        font-size: var(--font-size-xs);
+        @include mixins.typography(mini, var(--card-label));
         font-weight: var(--font-weight-600);
     }
 
@@ -112,7 +105,7 @@
     }
 
     &__table &__priority {
-        font-size: var(--font-size-xs);
+        @include mixins.typography(mini);
         font-weight: var(--font-weight-700);
 
         &--high {

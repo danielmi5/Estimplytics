@@ -27,21 +27,19 @@
         padding: var(--spacing-xs) var(--spacing-sm);
 
         border-radius: var(--radius-full);
+
         background: var(--bg-info);
 
-        color: var(--text-important);
-        font-size: var(--font-size-sm);
+        @include mixins.typography(small, var(--text-important));
+
         font-weight: var(--font-weight-600);
         letter-spacing: 0.02em;
     }
 
     &__title {
-        margin: 0 0 var(--spacing-md);
-
-        color: var(--text);
-        font-family: var(--font-secondary);
+        @include mixins.typography(h2);
+        margin-bottom: var(--spacing-md);
         font-size: clamp(2.2rem, 4vw, 4.1rem);
-        font-weight: var(--font-weight-700);
         line-height: 1.02;
 
         span {

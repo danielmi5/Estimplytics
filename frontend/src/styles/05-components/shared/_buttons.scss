@@ -7,28 +7,31 @@
 	gap: var(--spacing-xs);
 	padding: var(--spacing-md) var(--spacing-lg);
 	border-radius: var(--radius-md);
-	font-size: var(--font-size-base);
+	@include mixins.typography(paragraph);
 	font-weight: var(--font-weight-700);
+	line-height: var(--line-height-normal);
 	text-decoration: none;
 	border: 1px solid transparent;
 	cursor: pointer;
 
 	&--sm {
 		padding: var(--spacing-xs) var(--spacing-md);
-		font-size: var(--font-size-sm);
+		@include mixins.typography(small);
 		font-weight: var(--font-weight-600);
 	}
 
 	&--md {
 		padding: var(--spacing-md) var(--spacing-lg);
-		font-size: var(--font-size-base);
+		@include mixins.typography(paragraph);
 		font-weight: var(--font-weight-700);
+		line-height: var(--line-height-normal);
 	}
 
 	&--lg {
 		padding: var(--spacing-lg) var(--spacing-xl);
-		font-size: var(--font-size-lg);
+		@include mixins.typography(button);
 		font-weight: var(--font-weight-700);
+		line-height: var(--line-height-normal);
 	}
 
 	&--full-width {
@@ -61,22 +64,6 @@
 
 		cursor: pointer;
 		transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease;
-
-		&:hover {
-			background: var(--button-secondary-hover);
-		}
-
-		&:active {
-			background: var(--button-secondary-clicked);
-		}
-	}
-
-	&--light {
-		background: var(--button-secondary-default);
-		color: var(--text-important);
-
-		cursor: pointer;
-		transition: background var(--transition-fast) ease;
 
 		&:hover {
 			background: var(--button-secondary-hover);

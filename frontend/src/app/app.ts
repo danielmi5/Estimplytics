@@ -10,4 +10,6 @@ import { NotificationList } from './components/shared/notification/notification'
   imports: [Footer, Header, RouterOutlet, NotificationList],
   templateUrl: './app.html'
 })
-export class App {}
+export class App {
+  isScrolled = false;
+}

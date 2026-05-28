@@ -1,16 +1,13 @@
 @use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
 
 .stats {
     padding: 0;
 
     &__title {
-        margin: 0 0 var(--spacing-xl);
-
-        color: var(--text);
-
-        font-family: var(--font-secondary);
+        @include mixins.typography(h3);
+        margin-bottom: var(--spacing-xl);
         font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-        font-weight: var(--font-weight-700);
     }
 
     &__grid {

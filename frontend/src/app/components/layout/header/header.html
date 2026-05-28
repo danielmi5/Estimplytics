@@ -17,7 +17,7 @@
     </nav>
 
     <div class="header__actions">
-      <button class="header__avatar" type="button" [attr.aria-label]="avatarLabel()" aria-haspopup="menu" aria-expanded="false">{{ avatarInitials() }}</button>
+      <a class="header__avatar" [routerLink]="'/configuration'" [attr.aria-label]="avatarLabel()" aria-haspopup="menu" aria-expanded="false" (click)="closeMobileMenu()">{{ avatarInitials() }}</a>
 
       <button class="header__menu" type="button" [attr.aria-expanded]="mobileMenuAriaExpanded()" [attr.aria-label]="mobileMenuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'" (click)="toggleMobileMenu()">
         <span [feather]="mobileMenuOpen() ? 'x' : 'menu'" variant="header" aria-hidden="true"></span>
