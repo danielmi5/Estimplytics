@@ -7,6 +7,7 @@ import { Button } from '../../shared/button/button';
 import { FormInput } from '../../shared/form-input/form-input';
 import { emailTldValidator, getRegisterFieldMessage, getRegisterFieldState, type RegisterFieldName, type RegisterFieldState } from '../../../form/validators';
 import { AppStateService, AuthService } from '../../../services';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
 	selector: 'app-login-form',
@@ -18,13 +19,19 @@ import { AppStateService, AuthService } from '../../../services';
 export class LoginForm {
 	private readonly fb = inject(FormBuilder);
 	private readonly auth = inject(AuthService);
-	protected readonly appState = inject(AppStateService);
+	private readonly appState = inject(AppStateService);
+	private readonly notificationService = inject(NotificationService);
 	private readonly router = inject(Router);
 	private readonly route = inject(ActivatedRoute);
 
 	readonly registerSuccess = toSignal(
 		this.route.queryParamMap.pipe(map((params) => params.get('registered') === 'true')),
 		{ initialValue: false }
+	);
+
+	readonly returnUrl = toSignal(
+		this.route.queryParamMap.pipe(map((params) => params.get('returnUrl'))),
+		{ initialValue: null }
 	);
 
 	readonly form = this.fb.nonNullable.group({
@@ -62,16 +69,17 @@ export class LoginForm {
 
 		const { email, password } = this.form.getRawValue();
 		this.appState.setLoading(true);
-		this.appState.setError(null);
 
 		this.auth.login({ email, password }).subscribe({
 			next: () => {
 				this.appState.setLoading(false);
-				void this.router.navigate(['/']);
+				const redirect = this.route.snapshot.queryParamMap.get('returnUrl');
+				const safeRedirect = redirect?.startsWith('/') ? redirect : '/';
+				void this.router.navigateByUrl(safeRedirect);
 			},
 			error: () => {
 				this.appState.setLoading(false);
-				this.appState.setError('Credenciales inválidas');
+				this.notificationService.error('Credenciales inválidas. Verifica tu correo y contraseña.');
 			}
 		});
 	}

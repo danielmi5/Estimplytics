@@ -83,7 +83,7 @@
 
 	<footer class="register__footer">
 		<p class="register__login">
-			¿Ya tienes una cuenta? <a routerLink="/login" class="link">Inicia sesión</a>
+			¿Ya tienes una cuenta? <a [routerLink]="'/login'" [queryParams]="returnUrl() ? { returnUrl: returnUrl() } : {}" class="link">Inicia sesión</a>
 		</p>
 	</footer>
 </section>

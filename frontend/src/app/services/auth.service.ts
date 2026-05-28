@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AppStateService, AppUser } from './app-state.service';
+import { AppStateService } from './app-state.service';
 import { LoginRequest, RegisterRequest, TokenResponse } from '../models/auth.models';
 import { UserResponse } from '../core/users/user.dto';
 
@@ -28,7 +28,7 @@ export class AuthService {
         localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
         localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
         localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-        this.appState.setUser({ email: response.user.email, name: response.user.name, role: response.user.role });
+        this.appState.setUser(response.user);
       })
     );
   }
@@ -74,7 +74,7 @@ export class AuthService {
     if (user) {
       try {
         const u = JSON.parse(user) as UserResponse;
-        this.appState.setUser({ email: u.email, name: u.name, role: u.role });
+        this.appState.setUser(u);
       } catch {
         this.appState.setUser(null);
       }
@@ -91,7 +91,7 @@ export class AuthService {
         localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
         if (response.user) {
           localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-          this.appState.setUser({ email: response.user.email, name: response.user.name, role: response.user.role });
+          this.appState.setUser(response.user);
         }
       })
     );

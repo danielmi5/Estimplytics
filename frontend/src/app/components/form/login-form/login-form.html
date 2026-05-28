@@ -9,10 +9,6 @@
 		<p class="login__success" role="status">Registro completado. Inicia sesión con tu cuenta.</p>
 	}
 
-	@if (appState.error()) {
-		<p class="login__error" role="alert">{{ appState.error() }}</p>
-	}
-
 	<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form" aria-label="Formulario de inicio de sesión" novalidate>
 		<div class="form__group">
 			<app-form-input
@@ -51,7 +47,7 @@
 
 	<footer class="login__footer">
 		<p class="login__login">
-			¿No tienes cuenta? <a routerLink="/register" class="link">Regístrate</a>
+			¿No tienes cuenta? <a [routerLink]="'/register'" [queryParams]="returnUrl() ? { returnUrl: returnUrl() } : {}" class="link">Regístrate</a>
 		</p>
 	</footer>
 </section>
