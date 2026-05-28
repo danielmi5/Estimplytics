@@ -1,7 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
 import { tap, catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth.service';
 
 export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
   const started = Date.now();
@@ -22,14 +20,3 @@ export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(AuthService).getToken();
-
-  if (token && !req.url.includes('/api/auth/token')) {
-    req = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
-    });
-  }
-
-  return next(req);
-};
