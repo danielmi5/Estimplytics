@@ -2,9 +2,12 @@ package com.estimplytics.backend.controller;
 
 import com.estimplytics.backend.dto.TokenRequestDTO;
 import com.estimplytics.backend.dto.TokenResponseDTO;
+import com.estimplytics.backend.entity.User;
 import com.estimplytics.backend.repository.UserRepository;
+import com.estimplytics.backend.dto.RefreshRequestDTO;
+import com.estimplytics.backend.dto.UserResponseDTO;
 import com.estimplytics.backend.security.JwtService;
-import com.estimplytics.backend.security.TokenBlacklistService;
+import com.estimplytics.backend.security.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,17 +32,17 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final TokenBlacklistService tokenBlacklistService;
     private final UserRepository userRepository;
+    private final CustomUserDetailsService userDetailsService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, TokenBlacklistService tokenBlacklistService, UserRepository userRepository) {
+    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, CustomUserDetailsService userDetailsService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.tokenBlacklistService = tokenBlacklistService;
+        this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/token")
+    @PostMapping("/login")
     @Operation(summary = "Login", description = "Authenticates the user and returns a JWT token")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Token generated successfully"),
@@ -57,31 +60,63 @@ public class AuthController {
         }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String name = userRepository.findByEmail(request.getEmail())
-                .map(user -> user.getName())
-                .orElse(null);
-        String token = jwtService.generateToken(userDetails, name);
+        User userEntity = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        String access = jwtService.generateToken(userDetails, userEntity.getName());
+        String refresh = jwtService.generateRefreshToken(userDetails);
 
         return ResponseEntity.ok(TokenResponseDTO.builder()
-                .accessToken(token)
-                .tokenType("Bearer")
-                .expiresIn(jwtService.getAccessTokenSeconds())
-                .build());
+            .accessToken(access)
+            .refreshToken(refresh)
+            .tokenType("Bearer")
+            .expiresIn(jwtService.getAccessTokenSeconds())
+            .user(UserResponseDTO.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .role(userEntity.getRole() != null ? userEntity.getRole().name() : null)
+                .createdAt(userEntity.getCreatedAt())
+                .build())
+            .build());
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh access token", description = "Exchanges a valid refresh token for a new access token")
+    public ResponseEntity<TokenResponseDTO> refresh(@RequestBody @Valid RefreshRequestDTO request) {
+        String refresh = request.getRefreshToken();
+        String email;
+        try {
+            email = jwtService.extractUsername(refresh);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (email == null || !jwtService.isRefreshTokenValid(refresh)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        User userEntity = userRepository.findByEmail(email).orElseThrow();
+
+        String access = jwtService.generateToken(userDetails, userEntity.getName());
+        String newRefresh = jwtService.generateRefreshToken(userDetails);
+
+        return ResponseEntity.ok(TokenResponseDTO.builder()
+            .accessToken(access)
+            .refreshToken(newRefresh)
+            .tokenType("Bearer")
+            .expiresIn(jwtService.getAccessTokenSeconds())
+            .user(UserResponseDTO.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .role(userEntity.getRole() != null ? userEntity.getRole().name() : null)
+                .createdAt(userEntity.getCreatedAt())
+                .build())
+            .build());
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Logout", description = "Invalidates the current JWT token")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Session logged out successfully"),
-        @ApiResponse(responseCode = "400", description = "Token not provided or invalid")
-    })
     public ResponseEntity<Void> logout(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            tokenBlacklistService.addToBlacklist(token);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.noContent().build();
     }
 }
