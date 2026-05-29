@@ -1,5 +1,5 @@
-@use "../../00-settings/variables" as vars;
-@use "../../01-tools/mixins" as mixins;
+@use "../00-settings/variables" as vars;
+@use "../01-tools/mixins" as mixins;
 
 .sidebar {
   width: 14rem;
