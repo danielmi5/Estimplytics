@@ -20,6 +20,12 @@ export const routes: Routes = [
 		title: 'Login'
 	},
 	{
+		path: 'configuration',
+		loadComponent: () => import('./pages/configuration/configuration').then((m) => m.ConfigurationPage),
+		canActivate: [authGuard],
+		title: 'Configuración'
+	},
+	{
 		path: 'home',
 		redirectTo: '',
 		pathMatch: 'full'
