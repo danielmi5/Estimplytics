@@ -1,0 +1,130 @@
+@use "../../00-settings/variables" as vars;
+@use "../../01-tools/mixins" as mixins;
+
+.redmine-sync-form {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+
+  @include mixins.flex(column, 0);
+
+  padding: var(--spacing-xl);
+
+  background: var(--bg);
+  border-top: var(--spacing-sm) solid var(--color-error);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+
+  &__header {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  &__title {
+    margin-bottom: var(--spacing-sm);
+
+    @include mixins.flex(row, var(--spacing-sm), flex-start, center);
+    @include mixins.typography(h3);
+
+    letter-spacing: 0.01em;
+  }
+
+  &__info {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+
+    border-left: var(--border-thick) solid var(--color-info);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+
+    background: var(--bg-info);
+
+    &-text {
+      margin: 0;
+
+      @include mixins.typography(small);
+
+      line-height: var(--line-height-relaxed);
+    }
+  }
+
+  &__form {
+    @include mixins.flex(column, var(--spacing-lg));
+  }
+
+  &__api-key {
+    @include mixins.flex(column, var(--spacing-xs));
+  }
+
+  &__api-key-header {
+    @include mixins.flex(row, 0, space-between, center);
+  }
+
+  &__api-key-label {
+    @include mixins.typography(mini);
+
+    font-weight: var(--font-weight-700);
+    letter-spacing: 0.02em;
+  }
+
+  &__api-key-link {
+    @include mixins.typography(mini, var(--text-important));
+
+    font-weight: var(--font-weight-600);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+
+    &:focus-visible {
+      outline: var(--border-medium) solid var(--text-important);
+      outline-offset: var(--border-medium);
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  &__status {
+    padding: var(--spacing-md);
+
+    @include mixins.flex(row, var(--spacing-md), flex-start, center);
+
+    border: var(--border-thin) solid var(--border);
+    border-radius: var(--radius-sm);
+
+    @include mixins.typography(small);
+
+    font-weight: var(--font-weight-500);
+  }
+
+  &__status-dot {
+    flex-shrink: 0;
+    width: 0.75rem;
+    height: 0.75rem;
+
+    border-radius: var(--radius-sm);
+
+    background: var(--card-label);
+
+    transition: background var(--transition-fast) ease;
+  }
+
+  &__status-label {
+    font-weight: inherit;
+  }
+
+  &__status[data-status="connected"] &__status-dot {
+    background: var(--color-success);
+  }
+
+  &__status[data-status="loading"] &__status-dot {
+    background: var(--color-warning);
+    animation: redmine-sync-form-pulse 1s ease infinite;
+  }
+
+  &__status[data-status="error"] &__status-dot {
+    background: var(--color-error);
+  }
+
+  @keyframes redmine-sync-form-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+}
