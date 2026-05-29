@@ -25,11 +25,11 @@ export class Sidebar {
   readonly userInitials = this.appState.userInitials;
 
   readonly navItems: NavItem[] = [
-    { label: 'Dashboard',     route: '/',               icon: 'home',       exact: true  },
-    { label: 'Requests',      route: '/requests',       icon: 'pie-chart',     exact: false },
-    { label: 'Analytics',     route: '/analytics',      icon: 'slack',   exact: false },
-    { label: 'History',       route: '/history',        icon: 'layers',     exact: false },
-    { label: 'Configuration', route: '/configuration',  icon: 'settings',   exact: false },
+    { label: 'Dashboard', route: '/', icon: 'home', exact: true  },
+    { label: 'Peticiones', route: '/requests', icon: 'pie-chart', exact: false },
+    { label: 'Análisis', route: '/analytics', icon: 'slack', exact: false },
+    { label: 'Historial', route: '/history', icon: 'layers', exact: false },
+    { label: 'Configuración', route: '/configuration', icon: 'settings', exact: false },
 ];
 
   logout(): void {
