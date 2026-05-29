@@ -68,15 +68,13 @@ export class RegisterForm {
 		const { name, email, password } = this.form.getRawValue();
 		this.appState.setLoading(true);
 
-		this.auth.register({ name, email, password }).subscribe({
+		this.auth.registerAndLogin({ name, email, password }).subscribe({
 			next: () => {
 				this.appState.setLoading(false);
-				const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-				const queryParams: Record<string, string> = { email, registered: 'true' };
-				if (returnUrl?.startsWith('/')) {
-					queryParams['returnUrl'] = returnUrl;
-				}
-				void this.router.navigate(['/login'], { queryParams });
+				this.notificationService.success('Cuenta creada. ¡Bienvenido!');
+				const redirect = this.route.snapshot.queryParamMap.get('returnUrl');
+				const safeRedirect = redirect?.startsWith('/') ? redirect : '/';
+				void this.router.navigateByUrl(safeRedirect);
 			},
 			error: () => {
 				this.appState.setLoading(false);

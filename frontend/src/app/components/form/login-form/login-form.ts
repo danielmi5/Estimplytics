@@ -24,11 +24,6 @@ export class LoginForm {
 	private readonly router = inject(Router);
 	private readonly route = inject(ActivatedRoute);
 
-	readonly registerSuccess = toSignal(
-		this.route.queryParamMap.pipe(map((params) => params.get('registered') === 'true')),
-		{ initialValue: false }
-	);
-
 	readonly returnUrl = toSignal(
 		this.route.queryParamMap.pipe(map((params) => params.get('returnUrl'))),
 		{ initialValue: null }
@@ -73,6 +68,7 @@ export class LoginForm {
 		this.auth.login({ email, password }).subscribe({
 			next: () => {
 				this.appState.setLoading(false);
+				this.notificationService.success('Sesión iniciada correctamente.');
 				const redirect = this.route.snapshot.queryParamMap.get('returnUrl');
 				const safeRedirect = redirect?.startsWith('/') ? redirect : '/';
 				void this.router.navigateByUrl(safeRedirect);

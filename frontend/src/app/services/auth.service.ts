@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap, throwError } from 'rxjs';
+import { concat, ignoreElements, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AppStateService } from './app-state.service';
 import { LoginRequest, RegisterRequest, TokenResponse } from '../models/auth.models';
@@ -40,6 +40,14 @@ export class AuthService {
       password: data.password,
       role: 'ANALYST'
     });
+  }
+
+  registerAndLogin(data: RegisterRequest): Observable<TokenResponse> {
+    const credentials = { email: data.email, password: data.password };
+    return concat(
+      this.register(data).pipe(ignoreElements()),
+      this.login(credentials)
+    );
   }
 
   logout(): void {
