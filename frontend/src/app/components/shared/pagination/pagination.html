@@ -1,0 +1,37 @@
+<nav class="pagination" aria-label="Paginación">
+  <p class="pagination__summary">
+    Mostrando {{ showingCount() }} de {{ totalElements() }} resultados
+  </p>
+
+  @if (totalPages() > 1) {
+    <div class="pagination__controls">
+      <app-button
+        variant="secondary"
+        size="sm"
+        label="Anterior"
+        ariaLabel="Página anterior"
+        [disabled]="page() === 0"
+        (pressed)="goToPage(page() - 1)"
+      />
+
+      @for (pageNumber of pages(); track pageNumber) {
+        <app-button
+          [variant]="pageNumber === page() ? 'primary' : 'secondary'"
+          size="sm"
+          [label]="'' + (pageNumber + 1)"
+          [ariaLabel]="'Página ' + (pageNumber + 1)"
+          (pressed)="goToPage(pageNumber)"
+        />
+      }
+
+      <app-button
+        variant="secondary"
+        size="sm"
+        label="Siguiente"
+        ariaLabel="Página siguiente"
+        [disabled]="page() >= totalPages() - 1"
+        (pressed)="goToPage(page() + 1)"
+      />
+    </div>
+  }
+</nav>
