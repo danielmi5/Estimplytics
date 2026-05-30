@@ -9,7 +9,14 @@ import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.ProjectNotFoundException;
 import com.estimplytics.backend.repository.ProjectRepository;
 import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class RequestMapper implements IMapper<Request, RequestRequestDTO, RequestResponseDTO, RequestUpdateDTO> {
@@ -54,6 +61,26 @@ public class RequestMapper implements IMapper<Request, RequestRequestDTO, Reques
         if (entity == null) {
             return null;
         }
+        RedmineIssueMetadata metadata = redmineIssueMetadataRepository.findByRequestId(entity.getId()).orElse(null);
+        return toResponseDTO(entity, metadata);
+    }
+
+    public Page<RequestResponseDTO> toResponseDTOPage(Page<Request> page) {
+        List<Request> content = page.getContent();
+        if (content.isEmpty()) {
+            return page.map(entity -> null);
+        }
+        List<UUID> ids = content.stream().map(Request::getId).toList();
+        Map<UUID, RedmineIssueMetadata> metadataByRequestId = redmineIssueMetadataRepository.findByRequestIdIn(ids)
+                .stream()
+                .collect(Collectors.toMap(metadata -> metadata.getRequest().getId(), Function.identity(), (a, b) -> a));
+        return page.map(entity -> toResponseDTO(entity, metadataByRequestId.get(entity.getId())));
+    }
+
+    private RequestResponseDTO toResponseDTO(Request entity, RedmineIssueMetadata metadata) {
+        if (entity == null) {
+            return null;
+        }
 
         Project project = entity.getProject();
 
@@ -76,8 +103,9 @@ public class RequestMapper implements IMapper<Request, RequestRequestDTO, Reques
                     .projectName(project.getName());
         }
 
-        redmineIssueMetadataRepository.findByRequestId(entity.getId())
-                .ifPresent(metadata -> applyMetadata(builder, metadata, project == null));
+        if (metadata != null) {
+            applyMetadata(builder, metadata, project == null);
+        }
 
         return builder.build();
     }
