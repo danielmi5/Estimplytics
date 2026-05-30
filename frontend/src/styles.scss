@@ -12,6 +12,8 @@
 @use "./styles/05-components/shared/buttons";
 @use "./styles/05-components/shared/form-input";
 @use "./styles/05-components/shared/form-checkbox";
+@use "./styles/05-components/shared/table";
+@use "./styles/05-components/shared/pagination";
 @use "./styles/05-components/shared/kpi-card";
 @use "./styles/05-components/shared/activity-card";
 @use "./styles/05-components/shared/stat-card";
@@ -26,3 +28,4 @@
 @use "./styles/05-components/configuration";
 @use "./styles/05-components/configuration/user-profile-form";
 @use "./styles/05-components/configuration/redmine-sync-form";
+@use "./styles/05-components/requests-page";
