@@ -3,21 +3,21 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 
-import { HomePage } from './home';
+import { RequestsPage } from './requests';
 
-describe('HomePage', () => {
-  let component: HomePage;
-  let fixture: ComponentFixture<HomePage>;
+describe('RequestsPage', () => {
+  let component: RequestsPage;
+  let fixture: ComponentFixture<RequestsPage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-        imports: [HomePage],
-        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()]
+      imports: [RequestsPage],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HomePage);
+    fixture = TestBed.createComponent(RequestsPage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it('should create', () => {
