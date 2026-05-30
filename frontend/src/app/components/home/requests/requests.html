@@ -13,43 +13,40 @@
       <p class="requests__subtitle">Sincronizadas desde Redmine</p>
     </header>
 
-    <section class="requests__table-wrap">
-      <table class="requests__table">
-        <thead>
+    <app-data-table>
+      <thead>
+        <tr>
+          <th>Ticket ID</th>
+          <th>Título</th>
+          <th>Fuente</th>
+          <th>Fecha</th>
+          <th>Prioridad</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (request of requests(); track request.id) {
           <tr>
-            <th>Ticket ID</th>
-            <th>Título</th>
-            <th>Fuente</th>
-            <th>Fecha</th>
-            <th>Prioridad</th>
-            <th>Acción</th>
+            <td><span class="data-table__ticket">{{ request.originRequestCode ?? request.id }}</span></td>
+            <td class="data-table__cell-title">{{ request.title }}</td>
+            <td><span class="data-table__project">{{ sourceLabel(request) }}</span></td>
+            <td class="data-table__date">{{ request.createdDate | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <app-badge [baseClass]="'requests__priority'" [tone]="priorityTone(request)">
+                {{ request.priority | titlecase }}
+              </app-badge>
+            </td>
+            <td>
+              <app-button
+                variant="secondary"
+                size="sm"
+                label="Iniciar análisis"
+                routerLink="">
+              </app-button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (request of requests(); track request.id) {
-            <tr>
-              <td><span class="requests__ticket">{{ request.id }}</span></td>
-              <td class="requests__title">{{ request.title }}</td>
-              <td><span class="requests__source">{{ request.source }}</span></td>
-              <td class="requests__date">{{ request.date }}</td>
-              <td>
-                <app-badge [baseClass]="'requests__priority'" [tone]="request.priority">
-                  {{ request.priority | titlecase }}
-                </app-badge>
-              </td>
-              <td>
-                <app-button
-                  variant="secondary"
-                  size="sm"
-                  label="Iniciar análisis"
-                  icon="play"
-                  routerLink="">
-                </app-button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </section>
+        }
+      </tbody>
+    </app-data-table>
   </section>
 </section>

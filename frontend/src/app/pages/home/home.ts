@@ -4,7 +4,7 @@ import { DashboardHero } from '../../components/home/hero/welcome';
 import { MetricsSummary } from '../../components/home/kpis/metrics-summary';
 import { Requests } from '../../components/home/requests/requests';
 import { Stats } from '../../components/home/stats/stats';
-import { ActivityItem, KpiCard, PendingRequest, StatMetric, SummaryMetric } from './home.models';
+import { ActivityItem, KpiCard, StatMetric, SummaryMetric } from './home.models';
 
 @Component({
   selector: 'app-home',
@@ -40,30 +40,6 @@ export class HomePage {
       changeType: 'positive',
       icon: 'documents',
       description: 'Informes, resúmenes y entregables listos para validar.'
-    }
-  ];
-
-  readonly requests: PendingRequest[] = [
-    {
-      id: 'IM-2481',
-      title: 'Optimización del flujo de aprobación de facturas',
-      source: 'Redmine',
-      date: 'Hoy, 09:30',
-      priority: 'high'
-    },
-    {
-      id: 'IM-2473',
-      title: 'Nueva validación para el formulario de clientes',
-      source: 'Jira',
-      date: 'Ayer, 17:45',
-      priority: 'medium'
-    },
-    {
-      id: 'IM-2468',
-      title: 'Ajuste de permisos para el módulo de seguimiento',
-      source: 'Redmine',
-      date: 'Ayer, 11:20',
-      priority: 'low'
     }
   ];
 

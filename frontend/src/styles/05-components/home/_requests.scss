@@ -36,75 +36,7 @@
         }
     }
 
-    &__table-wrap {
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 1.35rem;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    &__table {
-        width: 100%;
-        border-collapse: collapse;
-
-        thead {
-            background: var(--bg-cards);
-        }
-
-        th {
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-bottom: 1px solid var(--border);
-            @include mixins.typography(mini, var(--card-label));
-            font-weight: var(--font-weight-700);
-            letter-spacing: 0.07em;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-            font-size: var(--font-size-sm);
-            text-align: center;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: var(--bg-cards);
-        }
-    }
-
-    &__table &__ticket {
-        @include mixins.typography(h6, var(--text-important));
-        font-size: inherit;
-    }
-
-    &__table &__title {
-        max-width: 22rem;
-        color: var(--text);
-        font-weight: var(--font-weight-500);
-    }
-
-    &__table &__source {
-        display: inline-flex;
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius-full);
-        background: var(--bg);
-        @include mixins.typography(mini, var(--card-label));
-        font-weight: var(--font-weight-600);
-    }
-
-    &__table &__date {
-        color: var(--card-label);
-    }
-
-    &__table &__priority {
+    &__priority {
         @include mixins.typography(mini);
         font-weight: var(--font-weight-700);
 
@@ -125,14 +57,6 @@
         &__header {
             align-items: flex-start;
             flex-direction: column;
-        }
-
-        &__table-wrap {
-            border-radius: 1rem;
-        }
-
-        &__table {
-            min-width: 44rem;
         }
     }
 }

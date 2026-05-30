@@ -1,17 +1,43 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Button } from '../../shared/button/button';
 import { Badge } from '../../shared/badge/badge';
+import { DataTable } from '../../shared/data-table/data-table';
 import { FeatherIconDirective } from '../../../directives/feather-icon.directive';
-import { PendingRequest } from '../../../pages/home/home.models';
+import { RequestsApiService } from '../../../core/requests/requests-api.service';
+import { RequestResponse } from '../../../core/requests/request.dto';
 
 @Component({
   selector: 'app-requests',
-  imports: [TitleCasePipe, RouterLink, Button, Badge, FeatherIconDirective],
+  imports: [TitleCasePipe, DatePipe, RouterLink, Button, Badge, DataTable, FeatherIconDirective],
   templateUrl: './requests.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Requests {
-  readonly requests = input.required<PendingRequest[]>();
+  private readonly api = inject(RequestsApiService);
+
+  readonly requests = signal<RequestResponse[]>([]);
+
+  constructor() {
+    this.api.getAll({ page: 0, size: 5, sort: 'createdDate,desc' }).subscribe({
+      next: (page) => this.requests.set(page.content)
+    });
+  }
+
+  sourceLabel(request: RequestResponse): string {
+    return request.redmineId != null || request.originRequestCode?.startsWith('REDMINE-') ? 'Redmine' : 'Manual';
+  }
+
+  priorityTone(request: RequestResponse): string {
+    switch (request.priority?.toLowerCase()) {
+      case 'high':
+      case 'urgent':
+        return 'high';
+      case 'low':
+        return 'low';
+      default:
+        return 'medium';
+    }
+  }
 }
