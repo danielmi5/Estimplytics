@@ -22,8 +22,8 @@ public class RequestController implements IRequestController {
     }
 
     @Override
-    public ResponseEntity<Page<RequestResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(requestService.findAll(pageable));
+    public ResponseEntity<Page<RequestResponseDTO>> getAll(Pageable pageable, String search) {
+        return ResponseEntity.ok(requestService.findAll(pageable, search));
     }
 
     @Override

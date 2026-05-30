@@ -38,7 +38,15 @@ public class RequestService implements IRequestService {
 
     @Override
     public Page<RequestResponseDTO> findAll(Pageable pageable) {
-        return requestRepository.findAll(pageable).map(requestMapper::toResponseDTO);
+        return findAll(pageable, null);
+    }
+
+    @Override
+    public Page<RequestResponseDTO> findAll(Pageable pageable, String search) {
+        Page<Request> page = search == null || search.isBlank()
+                ? requestRepository.findAll(pageable)
+                : requestRepository.searchAll(search.trim(), pageable);
+        return requestMapper.toResponseDTOPage(page);
     }
 
     @Override
