@@ -1,0 +1,21 @@
+@use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
+
+.pagination {
+    @include mixins.flex(row, var(--spacing-lg), space-between, center);
+    margin-top: var(--spacing-xl);
+
+    &__summary {
+        margin: 0;
+        @include mixins.typography(small, var(--card-label));
+    }
+
+    &__controls {
+        @include mixins.flex(row, var(--spacing-xs), flex-end, center);
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: $breakpoint-md) {
+        @include mixins.flex(column, var(--spacing-md), flex-start, stretch);
+    }
+}
