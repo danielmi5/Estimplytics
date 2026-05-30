@@ -1,0 +1,43 @@
+@use "../00-settings/variables" as *;
+@use "../01-tools/mixins" as mixins;
+
+.app-main:has(.requests-page) {
+  min-height: auto;
+}
+
+.requests-page {
+  @include mixins.flex(row, 0);
+  align-items: stretch;
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    padding: var(--spacing-2xl) var(--spacing-3xl);
+    @include mixins.flex(column, var(--spacing-xl));
+
+    @media (max-width: $breakpoint-lg) {
+      padding-inline: var(--spacing-2xl);
+    }
+
+    @media (max-width: $breakpoint-md) {
+      padding-inline: var(--spacing-md);
+    }
+  }
+
+  &__header {
+    @include mixins.flex(column, var(--spacing-xs), flex-start, stretch);
+  }
+
+  &__title {
+    @include mixins.typography(h1);
+  }
+
+  &__subtitle {
+    margin: 0;
+    @include mixins.typography(paragraph, var(--card-label));
+  }
+
+  &__search {
+    max-width: 28rem;
+  }
+}

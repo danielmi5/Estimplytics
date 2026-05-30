@@ -26,6 +26,12 @@ export const routes: Routes = [
 		title: 'Configuración'
 	},
 	{
+		path: 'requests',
+		loadComponent: () => import('./pages/requests/requests').then((m) => m.RequestsPage),
+		canActivate: [authGuard],
+		title: 'Peticiones'
+	},
+	{
 		path: 'home',
 		redirectTo: '',
 		pathMatch: 'full'
