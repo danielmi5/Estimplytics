@@ -15,6 +15,7 @@ export class RequestsApiService {
     if (params?.page !== undefined) httpParams = httpParams.set('page', params.page);
     if (params?.size !== undefined) httpParams = httpParams.set('size', params.size);
     if (params?.sort) httpParams = httpParams.set('sort', params.sort);
+    if (params?.search) httpParams = httpParams.set('search', params.search);
     return this.http.get<Page<RequestResponse>>(this.baseUrl, { params: httpParams });
   }
 
