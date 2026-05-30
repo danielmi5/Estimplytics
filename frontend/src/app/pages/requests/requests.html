@@ -1,0 +1,65 @@
+<div class="requests-page">
+  <app-sidebar></app-sidebar>
+
+  <section class="requests-page__content">
+    <header class="requests-page__header">
+      <h1 class="requests-page__title">Peticiones</h1>
+      <p class="requests-page__subtitle">Sincronizadas desde Redmine o manuales</p>
+    </header>
+
+    <div class="requests-page__search">
+      <app-form-input
+        id="requests-search"
+        name="search"
+        label="Buscar"
+        placeholder="Ticket, título o proyecto..."
+        [formControl]="searchControl"
+        leftIcon="search"
+      />
+    </div>
+
+    <app-data-table>
+      <thead>
+        <tr>
+          <th>Ticket ID</th>
+          <th>Título</th>
+          <th>Proyecto</th>
+          <th>Fecha</th>
+          <th>Demanda</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (request of items(); track request.id) {
+          <tr>
+            <td><span class="data-table__ticket">{{ request.originRequestCode ?? request.id }}</span></td>
+            <td class="data-table__cell-title">{{ request.title }}</td>
+            <td><span class="data-table__project">{{ request.projectName ?? '—' }}</span></td>
+            <td class="data-table__date">{{ request.createdDate | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <app-badge [baseClass]="'data-table__demand'" [tone]="demandTone(request)">
+                {{ request.demandType ?? '—' }}
+              </app-badge>
+            </td>
+            <td>
+              <app-button
+                variant="secondary"
+                size="sm"
+                label="Iniciar análisis"
+                routerLink="">
+              </app-button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </app-data-table>
+
+    <app-pagination
+      [page]="page()"
+      [pageSize]="pageSize()"
+      [totalElements]="totalElements()"
+      [totalPages]="totalPages()"
+      (pageChange)="onPageChange($event)"
+    />
+  </section>
+</div>
