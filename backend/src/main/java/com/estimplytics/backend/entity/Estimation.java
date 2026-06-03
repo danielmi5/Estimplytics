@@ -28,14 +28,17 @@ public class Estimation {
     @Column(name = "fiability")
     private Integer fiability;
 
-    @Column(name = "hours_an")
-    private Integer hoursAn;
+    @Column(name = "hours_planning")
+    private Integer hoursPlanning;
 
-    @Column(name = "hours_as")
-    private Integer hoursAs;
+    @Column(name = "hours_analysis")
+    private Integer hoursAnalysis;
 
-    @Column(name = "hours_de")
-    private Integer hoursDe;
+    @Column(name = "hours_development")
+    private Integer hoursDevelopment;
+
+    @Column(name = "hours_testing")
+    private Integer hoursTesting;
 
     @Column(name = "total_hours")
     private Integer totalHours;

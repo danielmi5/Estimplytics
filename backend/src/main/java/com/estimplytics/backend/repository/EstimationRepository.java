@@ -12,9 +12,9 @@ import java.util.UUID;
 @Repository
 public interface EstimationRepository extends JpaRepository<Estimation, UUID> {
     @Query("""
-        SELECT e.actualHoursFeedback
+        SELECT e
         FROM Estimation e
         WHERE e.analysis.id IN :analysisIds AND e.actualHoursFeedback IS NOT NULL
     """)
-    List<Integer> findActualHoursFeedbackByAnalysisIds(@Param("analysisIds") List<UUID> analysisIds);
+    List<Estimation> findWithFeedbackByAnalysisIds(@Param("analysisIds") List<UUID> analysisIds);
 }

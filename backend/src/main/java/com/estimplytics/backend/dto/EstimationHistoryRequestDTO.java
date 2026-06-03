@@ -25,7 +25,7 @@ public class EstimationHistoryRequestDTO {
         private Integer frozenVersion;
 
     @NotNull
-        @Schema(description = "Historical estimation data", example = "{\"hoursAn\":10,\"hoursAs\":20}")
+        @Schema(description = "Historical estimation data", example = "{\"hoursPlanning\":5,\"hoursAnalysis\":10,\"hoursDevelopment\":20,\"hoursTesting\":8}")
         private Map<String, Object> snapshotData;
 
     @NotNull

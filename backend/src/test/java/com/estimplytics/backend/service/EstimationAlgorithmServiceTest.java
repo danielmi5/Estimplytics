@@ -1,6 +1,7 @@
 package com.estimplytics.backend.service;
 
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
+import com.estimplytics.backend.entity.Estimation;
 import com.estimplytics.backend.entity.ImpactAnalysis;
 import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.ImpactAnalysisNotFoundException;
@@ -95,7 +96,7 @@ class EstimationAlgorithmServiceTest {
         when(componentAnalysisRepository.findComponentIdsByAnalysisId(analysisId)).thenReturn(List.of(componentId));
         when(componentAnalysisRepository.findAnalysisIdsWithExactComponentSet(List.of(componentId), 1))
             .thenReturn(List.of(analysisId, firstHistoricalAnalysisId, secondHistoricalAnalysisId));
-        when(estimationRepository.findActualHoursFeedbackByAnalysisIds(List.of(firstHistoricalAnalysisId, secondHistoricalAnalysisId)))
+        when(estimationRepository.findWithFeedbackByAnalysisIds(List.of(firstHistoricalAnalysisId, secondHistoricalAnalysisId)))
             .thenReturn(List.of());
 
         EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(analysisId);
@@ -117,15 +118,43 @@ class EstimationAlgorithmServiceTest {
                 .thenReturn(List.of(componentId));
         when(componentAnalysisRepository.findAnalysisIdsWithExactComponentSet(List.of(componentId), 1))
                 .thenReturn(List.of(analysisId, firstHistoricalAnalysisId, secondHistoricalAnalysisId, thirdHistoricalAnalysisId));
-        when(estimationRepository.findActualHoursFeedbackByAnalysisIds(
+        when(estimationRepository.findWithFeedbackByAnalysisIds(
                 List.of(firstHistoricalAnalysisId, secondHistoricalAnalysisId, thirdHistoricalAnalysisId)))
-                .thenReturn(List.of(10, 11, 9));
+                .thenReturn(List.of(
+                    buildEstimation(10, 2, 3, 4, 1),
+                    buildEstimation(11, 2, 3, 5, 1),
+                    buildEstimation(9, 2, 2, 4, 1)
+                ));
 
         EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService
                 .calculateSuggestionForAnalysisId(analysisId);
 
+        assertThat(estimationAlgorithmResult.getSuggestedHoursPlanning()).isEqualTo(2);
+        assertThat(estimationAlgorithmResult.getSuggestedHoursAnalysis()).isEqualTo(3);
+        assertThat(estimationAlgorithmResult.getSuggestedHoursDevelopment()).isEqualTo(4);
+        assertThat(estimationAlgorithmResult.getSuggestedHoursTesting()).isEqualTo(1);
         assertThat(estimationAlgorithmResult.getSuggestedTotalHours()).isEqualTo(10);
         assertThat(estimationAlgorithmResult.getFiabilityPercentage()).isEqualTo(80);
+    }
+
+    @Test
+    void calculateSuggestionForAnalysisId_shouldUseTotalFeedbackAverage_whenPhaseHoursAreMissing() {
+        UUID analysisId = UUID.randomUUID();
+        UUID historicalAnalysisId = UUID.randomUUID();
+        UUID componentId = UUID.randomUUID();
+        stubAnalysisLookup(analysisId, historicalAnalysisId);
+
+        when(componentAnalysisRepository.findComponentIdsByAnalysisId(analysisId)).thenReturn(List.of(componentId));
+        when(componentAnalysisRepository.findAnalysisIdsWithExactComponentSet(List.of(componentId), 1))
+            .thenReturn(List.of(analysisId, historicalAnalysisId));
+        when(estimationRepository.findWithFeedbackByAnalysisIds(List.of(historicalAnalysisId)))
+            .thenReturn(List.of(buildEstimation(20, null, null, null, null)));
+
+        EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(analysisId);
+
+        assertThat(estimationAlgorithmResult.getSuggestedHoursPlanning()).isEqualTo(0);
+        assertThat(estimationAlgorithmResult.getSuggestedTotalHours()).isEqualTo(20);
+        assertThat(estimationAlgorithmResult.getFiabilityPercentage()).isEqualTo(60);
     }
 
     @Test
@@ -143,9 +172,16 @@ class EstimationAlgorithmServiceTest {
         when(componentAnalysisRepository.findComponentIdsByAnalysisId(analysisId)).thenReturn(List.of(componentId));
         when(componentAnalysisRepository.findAnalysisIdsWithExactComponentSet(List.of(componentId), 1))
             .thenReturn(List.of(analysisId, historicalId1, historicalId2, historicalId3, historicalId4, historicalId5, historicalId6));
-        when(estimationRepository.findActualHoursFeedbackByAnalysisIds(
+        when(estimationRepository.findWithFeedbackByAnalysisIds(
             List.of(historicalId1, historicalId2, historicalId3, historicalId4, historicalId5, historicalId6)))
-            .thenReturn(List.of(10, 10, 10, 10, 10, 10));
+            .thenReturn(List.of(
+                buildEstimation(10, 1, 2, 6, 1),
+                buildEstimation(10, 1, 2, 6, 1),
+                buildEstimation(10, 1, 2, 6, 1),
+                buildEstimation(10, 1, 2, 6, 1),
+                buildEstimation(10, 1, 2, 6, 1),
+                buildEstimation(10, 1, 2, 6, 1)
+            ));
 
         EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(analysisId);
 
@@ -166,15 +202,35 @@ class EstimationAlgorithmServiceTest {
                 .thenReturn(List.of(componentId));
         when(componentAnalysisRepository.findAnalysisIdsWithExactComponentSet(List.of(componentId), 1))
                 .thenReturn(List.of(analysisId, firstHistoricalAnalysisId, secondHistoricalAnalysisId, thirdHistoricalAnalysisId));
-        when(estimationRepository.findActualHoursFeedbackByAnalysisIds(
+        when(estimationRepository.findWithFeedbackByAnalysisIds(
                 List.of(firstHistoricalAnalysisId, secondHistoricalAnalysisId, thirdHistoricalAnalysisId)))
-                .thenReturn(List.of(5, 30, 60));
+                .thenReturn(List.of(
+                    buildEstimation(5, 1, 1, 2, 1),
+                    buildEstimation(30, 5, 5, 15, 5),
+                    buildEstimation(60, 10, 10, 30, 10)
+                ));
 
         EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService
                 .calculateSuggestionForAnalysisId(analysisId);
 
-        assertThat(estimationAlgorithmResult.getSuggestedTotalHours()).isEqualTo(32);
+        assertThat(estimationAlgorithmResult.getSuggestedTotalHours()).isEqualTo(31);
         assertThat(estimationAlgorithmResult.getFiabilityPercentage()).isEqualTo(65);
+    }
+
+    private Estimation buildEstimation(
+        Integer actualHoursFeedback,
+        Integer hoursPlanning,
+        Integer hoursAnalysis,
+        Integer hoursDevelopment,
+        Integer hoursTesting
+    ) {
+        return Estimation.builder()
+            .actualHoursFeedback(actualHoursFeedback)
+            .hoursPlanning(hoursPlanning)
+            .hoursAnalysis(hoursAnalysis)
+            .hoursDevelopment(hoursDevelopment)
+            .hoursTesting(hoursTesting)
+            .build();
     }
 
     private void stubAnalysisLookup(UUID... analysisIds) {

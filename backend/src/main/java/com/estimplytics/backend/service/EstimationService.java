@@ -5,9 +5,11 @@ import com.estimplytics.backend.dto.EstimationResponseDTO;
 import com.estimplytics.backend.dto.EstimationUpdateDTO;
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
 import com.estimplytics.backend.entity.Estimation;
+import com.estimplytics.backend.entity.RedmineIssueMetadata;
 import com.estimplytics.backend.exception.EstimationNotFoundException;
 import com.estimplytics.backend.mapper.EstimationMapper;
 import com.estimplytics.backend.repository.EstimationRepository;
+import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,7 @@ public class EstimationService implements IEstimationService {
     private final EstimationMapper mapper;
     private final EstimationAlgorithmService estimationAlgorithmService;
 
-    public EstimationService(
-        EstimationRepository repository,
-        EstimationMapper mapper,
-        EstimationAlgorithmService estimationAlgorithmService
-    ) {
+    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService) {
         this.repository = repository;
         this.mapper = mapper;
         this.estimationAlgorithmService = estimationAlgorithmService;
@@ -47,6 +45,10 @@ public class EstimationService implements IEstimationService {
     @Transactional
     public EstimationResponseDTO create(EstimationRequestDTO dto) {
         EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(dto.getAnalysisId());
+        dto.setHoursPlanning(estimationAlgorithmResult.getSuggestedHoursPlanning());
+        dto.setHoursAnalysis(estimationAlgorithmResult.getSuggestedHoursAnalysis());
+        dto.setHoursDevelopment(estimationAlgorithmResult.getSuggestedHoursDevelopment());
+        dto.setHoursTesting(estimationAlgorithmResult.getSuggestedHoursTesting());
         dto.setTotalHours(estimationAlgorithmResult.getSuggestedTotalHours());
         dto.setFiability(estimationAlgorithmResult.getFiabilityPercentage());
         Estimation entity = mapper.toEntity(dto);

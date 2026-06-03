@@ -1,6 +1,7 @@
 package com.estimplytics.backend.service;
 
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
+import com.estimplytics.backend.entity.Estimation;
 import com.estimplytics.backend.entity.ImpactAnalysis;
 import com.estimplytics.backend.entity.RedmineIssueMetadata;
 import com.estimplytics.backend.entity.Request;
@@ -46,16 +47,11 @@ public class EstimationAlgorithmService {
         ImpactAnalysis targetAnalysis = impactAnalysisRepository.findById(analysisId).orElseThrow(() -> new ImpactAnalysisNotFoundException("Impact analysis not found with id %s".formatted(analysisId)));
 
         Request targetRequest = targetAnalysis.getRequest();
-        RedmineIssueMetadata targetMetadata = targetRequest == null
-                ? null
-                : redmineIssueMetadataRepository.findByRequestId(targetRequest.getId()).orElse(null);
+        RedmineIssueMetadata targetMetadata = (targetRequest == null) ? null: redmineIssueMetadataRepository.findByRequestId(targetRequest.getId()).orElse(null);
 
         List<UUID> componentIds = componentAnalysisRepository.findComponentIdsByAnalysisId(analysisId);
         if (componentIds.isEmpty()) {
-            return EstimationAlgorithmResultDTO.builder()
-                .suggestedTotalHours(0)
-                .fiabilityPercentage(0)
-                .build();
+            return emptyResult();
         }
 
         List<UUID> historicalAnalysisIds = componentAnalysisRepository.findAnalysisIdsWithExactComponentSet(componentIds,componentIds.size())
@@ -65,30 +61,64 @@ public class EstimationAlgorithmService {
             .toList();
 
         if (historicalAnalysisIds.isEmpty()) {
-            return EstimationAlgorithmResultDTO.builder()
-                .suggestedTotalHours(0)
-                .fiabilityPercentage(0)
-                .build();
+            return emptyResult();
         }
 
-        List<Integer> historicalHours = estimationRepository.findActualHoursFeedbackByAnalysisIds(
-                historicalAnalysisIds
+        List<Estimation> historicalEstimations = estimationRepository.findWithFeedbackByAnalysisIds(historicalAnalysisIds);
+
+        if (historicalEstimations.isEmpty()) {
+            return emptyResult();
+        }
+
+        List<Integer> historicalTotalHours = historicalEstimations.stream()
+            .map(Estimation::getActualHoursFeedback)
+            .toList();
+
+        Integer suggestedPlanning = averagePhaseHours(
+            historicalEstimations.stream().map(Estimation::getHoursPlanning).toList()
         );
+        Integer suggestedAnalysis = averagePhaseHours(
+            historicalEstimations.stream().map(Estimation::getHoursAnalysis).toList()
+        );
+        Integer suggestedDevelopment = averagePhaseHours(
+            historicalEstimations.stream().map(Estimation::getHoursDevelopment).toList()
+        );
+        Integer suggestedTesting = averagePhaseHours(
+            historicalEstimations.stream().map(Estimation::getHoursTesting).toList()
+        );
+        Integer suggestedTotalHours = suggestedPlanning + suggestedAnalysis + suggestedDevelopment + suggestedTesting;
 
-        if (historicalHours.isEmpty()) {
-            return EstimationAlgorithmResultDTO.builder()
-                .suggestedTotalHours(0)
-                .fiabilityPercentage(0)
-                .build();
+        if (suggestedTotalHours == 0) {
+            suggestedTotalHours = calculateAverageHours(historicalTotalHours);
         }
-
-        Integer suggestedTotalHours = calculateAverageHours(historicalHours);
-        Integer fiability = calculateFiability(historicalHours);
 
         return EstimationAlgorithmResultDTO.builder()
+            .suggestedHoursPlanning(suggestedPlanning)
+            .suggestedHoursAnalysis(suggestedAnalysis)
+            .suggestedHoursDevelopment(suggestedDevelopment)
+            .suggestedHoursTesting(suggestedTesting)
             .suggestedTotalHours(suggestedTotalHours)
-            .fiabilityPercentage(fiability)
+            .fiabilityPercentage(calculateFiability(historicalTotalHours))
             .build();
+    }
+
+    private EstimationAlgorithmResultDTO emptyResult() {
+        return EstimationAlgorithmResultDTO.builder()
+            .suggestedHoursPlanning(0)
+            .suggestedHoursAnalysis(0)
+            .suggestedHoursDevelopment(0)
+            .suggestedHoursTesting(0)
+            .suggestedTotalHours(0)
+            .fiabilityPercentage(0)
+            .build();
+    }
+
+    private Integer averagePhaseHours(List<Integer> phaseHours) {
+        List<Integer> validHours = phaseHours.stream()
+            .filter(hours -> hours != null && hours > 0)
+            .toList();
+
+        return calculateAverageHours(validHours);
     }
 
     private boolean isValidIsolatedContext(RedmineIssueMetadata targetMetadata, UUID historicalAnalysisId) {
