@@ -24,11 +24,16 @@ public class EstimationService implements IEstimationService {
     private final EstimationRepository repository;
     private final EstimationMapper mapper;
     private final EstimationAlgorithmService estimationAlgorithmService;
+    private final ExcelGeneratorService excelGeneratorService;
+    private final RedmineIssueMetadataRepository redmineIssueMetadataRepository;
 
-    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService) {
+    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService, ExcelGeneratorService excelGeneratorService, RedmineIssueMetadataRepository redmineIssueMetadataRepository
+    ) {
         this.repository = repository;
         this.mapper = mapper;
         this.estimationAlgorithmService = estimationAlgorithmService;
+        this.excelGeneratorService = excelGeneratorService;
+        this.redmineIssueMetadataRepository = redmineIssueMetadataRepository;
     }
 
     @Override
@@ -72,5 +77,26 @@ public class EstimationService implements IEstimationService {
             throw new EstimationNotFoundException("Estimation not found with id %s".formatted(id));
         }
         repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ExcelExport> exportExcel(UUID id) {
+        return repository.findById(id).map(estimation -> {
+            String originRequestCode = resolveOriginRequestCode(estimation);
+            byte[] content = excelGeneratorService.exportEstimation(estimation, originRequestCode);
+            String filename = "Estimation-" + originRequestCode + ".xlsx";
+            return new ExcelExport(content, filename);
+        });
+    }
+
+    private String resolveOriginRequestCode(Estimation estimation) {
+        if (estimation.getAnalysis() == null || estimation.getAnalysis().getRequest() == null) {
+            return "";
+        }
+        UUID requestId = estimation.getAnalysis().getRequest().getId();
+        return redmineIssueMetadataRepository.findByRequestId(requestId)
+            .map(RedmineIssueMetadata::getOriginRequestCode)
+            .orElse("");
     }
 }
