@@ -1,13 +1,13 @@
 package com.estimplytics.backend.service;
 
 import com.estimplytics.backend.entity.Estimation;
+import com.estimplytics.backend.exception.ReportGenerationException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class ExcelGeneratorService {
     };
 
     public byte[] exportEstimation(Estimation estimation, String requestCode) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Estimation");
             CellStyle headerStyle = workbook.createCellStyle();
             headerStyle.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
@@ -57,10 +57,10 @@ public class ExcelGeneratorService {
             setCellValue(dataRow, 8, estimation.getActualHoursFeedback());
             setCellValue(dataRow, 9, estimation.getJustification());
 
-            workbook.write(out);
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to generate estimation Excel export", e);
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException exception) {
+            throw new ReportGenerationException("Error while generating Excel", exception);
         }
     }
 
