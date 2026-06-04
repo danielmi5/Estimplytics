@@ -32,6 +32,7 @@ public class ProjectMapper implements IMapper<Project, ProjectRequestDTO, Projec
                 .name(entity.getName())
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
+                .ownerId(entity.getOwner() != null ? entity.getOwner().getId() : null)
                 .build();
     }
 

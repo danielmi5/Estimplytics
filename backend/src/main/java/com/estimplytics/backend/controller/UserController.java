@@ -7,7 +7,6 @@ import com.estimplytics.backend.service.IUserService;
 import com.estimplytics.backend.service.OwnershipService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import com.estimplytics.backend.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
@@ -46,7 +45,7 @@ public class UserController implements IUserController {
 
     @Override
     public ResponseEntity<UserResponseDTO> update(UUID id, UserUpdateDTO request) {
-        ownershipService.requireSelfOrAdmin(id, SecurityContextHolder.getContext().getAuthentication());
+        ownershipService.requireUserOrAdmin(id);
         return ResponseEntity.ok(userService.update(id, request));
     }
 

@@ -98,6 +98,15 @@ public class RequestMapper implements IMapper<Request, RequestRequestDTO, Reques
                 .spentHours(entity.getSpentHours())
                 .createdDate(entity.getCreatedDate());
 
+        if (entity.getOwner() != null) {
+            builder.ownerId(entity.getOwner().getId());
+        }
+        if (entity.getAnalysedBy() != null) {
+            builder.analysedById(entity.getAnalysedBy().getId())
+                    .analysedByName(entity.getAnalysedBy().getName());
+        }
+        builder.analysedAt(entity.getAnalysedAt());
+
         if (project != null) {
             builder.projectId(project.getId())
                     .projectName(project.getName());

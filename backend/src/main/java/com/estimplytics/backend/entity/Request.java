@@ -57,6 +57,23 @@ public class Request {
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "analysed_by_id")
+    private User analysedBy;
+
+    @Column(name = "analysed_at")
+    private LocalDateTime analysedAt;
+
+    @OneToOne(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private ImpactAnalysis impactAnalysis;
+
+    @OneToOne(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private RedmineIssueMetadata redmineMetadata;
+
     @PrePersist
     protected void onCreate() {
         this.createdDate = LocalDateTime.now();
