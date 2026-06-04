@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.UUID;
 
@@ -31,13 +32,21 @@ public interface IRequestController {
 
     @PostMapping
     @Operation(summary = "Create a new record")
-    ResponseEntity<RequestResponseDTO> create(@RequestBody RequestRequestDTO request);
+    ResponseEntity<RequestResponseDTO> create(@Valid @RequestBody RequestRequestDTO request);
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a record")
-    ResponseEntity<RequestResponseDTO> update(@PathVariable UUID id, @RequestBody RequestUpdateDTO updateRequest);
+    ResponseEntity<RequestResponseDTO> update(@PathVariable UUID id, @Valid @RequestBody RequestUpdateDTO updateRequest);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a record")
     ResponseEntity<Void> delete(@PathVariable UUID id);
+
+    @PostMapping("/{id}/lock")
+    @Operation(summary = "Acquire analysis lock on a request")
+    ResponseEntity<RequestResponseDTO> lockForAnalysis(@PathVariable UUID id);
+
+    @PostMapping("/{id}/unlock")
+    @Operation(summary = "Release analysis lock on a request")
+    ResponseEntity<RequestResponseDTO> unlockFromAnalysis(@PathVariable UUID id);
 }

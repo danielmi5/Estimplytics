@@ -10,4 +10,8 @@ import java.util.UUID;
 
 public interface IRequestService extends ICrudService<RequestRequestDTO, RequestResponseDTO, RequestUpdateDTO, UUID> {
     Page<RequestResponseDTO> findAll(Pageable pageable, String search);
+
+    RequestResponseDTO lockForAnalysis(UUID requestId);
+
+    RequestResponseDTO unlockFromAnalysis(UUID requestId);
 }

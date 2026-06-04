@@ -4,6 +4,7 @@ import com.estimplytics.backend.dto.RequestRequestDTO;
 import com.estimplytics.backend.dto.RequestResponseDTO;
 import com.estimplytics.backend.dto.RequestUpdateDTO;
 import com.estimplytics.backend.entity.Request;
+import com.estimplytics.backend.entity.User;
 import com.estimplytics.backend.exception.RequestNotFoundException;
 import com.estimplytics.backend.mapper.RequestMapper;
 import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
@@ -23,17 +24,29 @@ public class RequestService implements IRequestService {
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final RedmineIssueMetadataRepository redmineMetadataRepository;
+    private final OwnershipService ownershipService;
 
-    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, RedmineIssueMetadataRepository redmineMetadataRepository) {
+    public RequestService(RequestRepository requestRepository, RequestMapper requestMapper, RedmineIssueMetadataRepository redmineMetadataRepository, OwnershipService ownershipService) {
         this.requestRepository = requestRepository;
         this.requestMapper = requestMapper;
         this.redmineMetadataRepository = redmineMetadataRepository;
+        this.ownershipService = ownershipService;
     }
 
     private void rejectIfRedmineSourced(UUID id) {
         if (redmineMetadataRepository.findByRequestId(id).isPresent()) {
             throw new AccessDeniedException("Redmine requests cannot be modified or deleted");
         }
+    }
+
+    private Page<Request> findAccessible(Pageable pageable, String search) {
+        User current = ownershipService.currentUser();
+        Optional<Long> instanceId = ownershipService.redmineInstanceId(current);
+        boolean hasSearch = search != null && !search.isBlank();
+        if (instanceId.isEmpty()) {
+            return hasSearch ? requestRepository.searchManualAccessible(current.getId(), search.trim(), pageable) : requestRepository.findManualAccessible(current.getId(), pageable);
+        }
+        return hasSearch ? requestRepository.searchAllAccessible(current.getId(), instanceId.get(), search.trim(), pageable) : requestRepository.findAllAccessible(current.getId(), instanceId.get(), pageable);
     }
 
     @Override
@@ -43,42 +56,57 @@ public class RequestService implements IRequestService {
 
     @Override
     public Page<RequestResponseDTO> findAll(Pageable pageable, String search) {
-        Page<Request> page = search == null || search.isBlank()
-                ? requestRepository.findAll(pageable)
-                : requestRepository.searchAll(search.trim(), pageable);
-        return requestMapper.toResponseDTOPage(page);
+        return requestMapper.toResponseDTOPage(findAccessible(pageable, search));
     }
 
     @Override
     public Optional<RequestResponseDTO> findById(UUID id) {
-        return requestRepository.findById(id).map(requestMapper::toResponseDTO);
+        return requestRepository.findById(id)
+                .filter(ownershipService::canView)
+                .map(requestMapper::toResponseDTO);
     }
 
     @Override
     @Transactional
     public RequestResponseDTO create(RequestRequestDTO dto) {
         Request entity = requestMapper.toEntity(dto);
-        Request savedEntity = requestRepository.save(entity);
-        return requestMapper.toResponseDTO(savedEntity);
+        ownershipService.requireOwnedProject(entity.getProject());
+        if (!ownershipService.isAdmin()) entity.setOwner(ownershipService.currentUser());
+        return requestMapper.toResponseDTO(requestRepository.save(entity));
     }
 
     @Override
     @Transactional
     public RequestResponseDTO update(UUID id, RequestUpdateDTO dto) {
         rejectIfRedmineSourced(id);
-        return requestRepository.findById(id).map(entity -> {
-            requestMapper.updateEntityFromDTO(dto, entity);
-            return requestMapper.toResponseDTO(requestRepository.save(entity));
-        }).orElseThrow(() -> new RequestNotFoundException("Request not found with id %s".formatted(id)));
+        Request request = requestRepository.findById(id).orElseThrow(() -> new RequestNotFoundException("Request not found with id %s".formatted(id)));
+        ownershipService.requireRequestOwner(request);
+        requestMapper.updateEntityFromDTO(dto, request);
+        return requestMapper.toResponseDTO(requestRepository.save(request));
     }
 
     @Override
     @Transactional
     public void delete(UUID id) {
         rejectIfRedmineSourced(id);
-        if (!requestRepository.existsById(id)) {
-            throw new RequestNotFoundException("Request not found with id %s".formatted(id));
-        }
-        requestRepository.deleteById(id);
+        Request request = requestRepository.findById(id).orElseThrow(() -> new RequestNotFoundException("Request not found with id %s".formatted(id)));
+        ownershipService.requireRequestOwner(request);
+        requestRepository.delete(request);
+    }
+
+    @Override
+    @Transactional
+    public RequestResponseDTO lockForAnalysis(UUID requestId) {
+        Request request = requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException("Request not found with id %s".formatted(requestId)));
+        ownershipService.lock(request);
+        return requestMapper.toResponseDTO(requestRepository.save(request));
+    }
+
+    @Override
+    @Transactional
+    public RequestResponseDTO unlockFromAnalysis(UUID requestId) {
+        Request request = requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException("Request not found with id %s".formatted(requestId)));
+        ownershipService.unlock(request);
+        return requestMapper.toResponseDTO(requestRepository.save(request));
     }
 }
