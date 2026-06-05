@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormInput } from '../../shared/form-input/form-input';
 import { FormSelect, FormSelectOption } from '../../shared/form-select/form-select';
@@ -17,8 +17,6 @@ import { getRequestFieldMessage, getRequestFieldState, type RequestFieldName, ty
 export class RequestForm {
   private readonly fb = inject(FormBuilder);
   readonly state = inject(RequestsStateService);
-
-  readonly created = output<void>();
 
   readonly priorityOptions: FormSelectOption[] = [
     { value: 'High', label: 'Alta' },
@@ -60,18 +58,17 @@ export class RequestForm {
       status: raw.status ?? 'OPEN',
     };
 
-    this.state.create(body, {
-      onSuccess: () => {
-        this.form.reset({
-          project: '',
-          title: '',
-          description: '',
-          demandType: '',
-          priority: 'Normal',
-          status: 'OPEN',
-        });
-        this.created.emit();
-      },
+    this.state.create(body);
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      project: '',
+      title: '',
+      description: '',
+      demandType: '',
+      priority: 'Normal',
+      status: 'OPEN',
     });
   }
 }

@@ -4,7 +4,7 @@
   <section class="requests-page__content">
     <header class="requests-page__header">
       <h1 class="requests-page__title">Peticiones</h1>
-      <p class="requests-page__subtitle">Sincronizadas desde Redmine o manuales</p>
+      <p class="requests-page__subtitle">Sincronizadas desde Redmine o creadas manualmente</p>
     </header>
 
     <div class="requests-page__search">
@@ -12,7 +12,7 @@
         id="requests-search"
         name="search"
         label="Buscar"
-        placeholder="Ticket, título o proyecto..."
+        placeholder="Código, título o proyecto..."
         [formControl]="searchControl"
         leftIcon="search"
       />
@@ -21,12 +21,12 @@
     <app-data-table>
       <thead>
         <tr>
-          <th>Ticket ID</th>
+          <th>Código</th>
           <th>Título</th>
           <th>Proyecto</th>
           <th>Fecha</th>
           <th>Demanda</th>
-          <th>Acción</th>
+          <th>Accion</th>
         </tr>
       </thead>
       <tbody>
@@ -46,7 +46,7 @@
                 variant="secondary"
                 size="sm"
                 label="Iniciar análisis"
-                routerLink="">
+                [routerLink]="['/analisis-impacto', request.id]">
               </app-button>
             </td>
           </tr>
@@ -61,5 +61,39 @@
       [totalPages]="totalPages()"
       (pageChange)="onPageChange($event)"
     />
+
+    <div class="requests-page__actions">
+      <app-button
+        variant="secondary"
+        [label]="isSyncing() ? 'Sincronizando…' : 'Sincronizar desde Redmine'"
+        buttonType="button"
+        size="md"
+        [disabled]="isSyncing() || isLoading() || !canSyncRedmine()"
+        (pressed)="onSyncRedmine()"
+        [ariaLabel]="isSyncing() ? 'Sincronizando peticiones desde Redmine' : 'Sincronizar peticiones desde Redmine'"
+      />
+
+      <app-button
+        variant="primary"
+        label="Crear petición"
+        buttonType="button"
+        size="md"
+        [disabled]="isLoading()"
+        (pressed)="openCreateModal()"
+        ariaLabel="Crear petición manual"
+      />
+    </div>
   </section>
 </div>
+
+<app-modal
+  [open]="isCreateModalOpen()"
+  title="Crear petición"
+  primaryLabel="Crear petición"
+  [disabled]="isLoading()"
+  (closed)="closeCreateModal()"
+  (secondaryAction)="closeCreateModal()"
+  (primaryAction)="requestForm()?.submit()"
+>
+  <app-request-form />
+</app-modal>

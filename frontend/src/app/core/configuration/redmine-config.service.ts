@@ -1,12 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { EMPTY, Observable, catchError, finalize, of, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, finalize, of, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ConnectionStatus, RedmineCredentialRequest, RedmineCredentialResponse } from './redmine-config.dto';
 import { NotificationService } from '../../services/notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class RedmineConfigService {
+  private static readonly SYNC_STORAGE_KEY = 'redmine-sync-active';
+
   private readonly http = inject(HttpClient);
   private readonly notificationService = inject(NotificationService);
   private readonly baseUrl = `${environment.apiUrl}/v1/redmine-credentials`;
@@ -14,8 +16,11 @@ export class RedmineConfigService {
   private readonly _credentials = signal<RedmineCredentialResponse[]>([]);
   private readonly _status = signal<ConnectionStatus>('none');
   private readonly _isLoading = signal(false);
-  private readonly _isSyncing = signal(false);
+  private readonly _isSyncing = signal(
+    sessionStorage.getItem(RedmineConfigService.SYNC_STORAGE_KEY) !== null
+  );
   private readonly _credentialsChecked = signal(false);
+  private _syncRequestActive = false;
 
   readonly credentials = this._credentials.asReadonly();
   readonly status = this._status.asReadonly();
@@ -78,12 +83,27 @@ export class RedmineConfigService {
       });
   }
 
+  hasPendingSync(): boolean {
+    return sessionStorage.getItem(RedmineConfigService.SYNC_STORAGE_KEY) !== null;
+  }
+
+  shouldRecoverSync(): boolean {
+    return this.hasPendingSync() && !this._syncRequestActive;
+  }
+
+  clearSyncState(): void {
+    sessionStorage.removeItem(RedmineConfigService.SYNC_STORAGE_KEY);
+    this._isSyncing.set(false);
+  }
+
   syncIssues(credentialId: number, fullSync = false, silent = false): Observable<string> {
+    sessionStorage.setItem(RedmineConfigService.SYNC_STORAGE_KEY, '1');
     this._isSyncing.set(true);
+    this._syncRequestActive = true;
 
     const params = new HttpParams()
       .set('credentialId', credentialId)
-      .set('fullSync', fullSync);
+      .set('fullSync', String(fullSync));
 
     return this.http
       .post(`${environment.apiUrl}/redmine/sync`, null, { params, responseType: 'text' })
@@ -92,15 +112,25 @@ export class RedmineConfigService {
           if (!silent) {
             this.notificationService.success(message || 'Peticiones sincronizadas correctamente.');
           }
+          this.completeSyncRequest();
         }),
-        catchError(() => {
+        catchError((error) => {
+          this.completeSyncRequest();
           if (!silent) {
             this.notificationService.error('No se pudieron sincronizar las peticiones. Inténtalo de nuevo.');
+            return EMPTY;
           }
-          return EMPTY;
+          return throwError(() => error);
         }),
-        finalize(() => this._isSyncing.set(false))
+        finalize(() => {
+          this._syncRequestActive = false;
+        })
       );
+  }
+
+  private completeSyncRequest(): void {
+    this._syncRequestActive = false;
+    this.clearSyncState();
   }
 
   save(request: RedmineCredentialRequest): void {

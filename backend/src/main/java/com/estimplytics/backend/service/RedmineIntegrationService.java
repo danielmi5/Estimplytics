@@ -61,6 +61,10 @@ public class RedmineIntegrationService {
         UserRedmineCredential credential = userRedmineCredentialRepository.findById(credentialId).orElseThrow(() -> new RedmineCredentialNotFoundException("Redmine credential not found with id %s".formatted(credentialId)));
         ownershipService.requireUserOrAdmin(credential.getUser().getId());
 
+        if (fullSync) {
+            credential.setLastSyncAt(null);
+        }
+
         int offset = 0;
         int limit = 100;
         int totalSynced = 0;

@@ -34,7 +34,7 @@ class RedmineIntegrationControllerTest {
         ResponseEntity<String> response = controller.syncIssues(1L, false);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Synchronization successful. 5 records synchronized.", response.getBody());
+        assertEquals("5", response.getBody());
     }
 
     @Test
@@ -44,7 +44,7 @@ class RedmineIntegrationControllerTest {
         ResponseEntity<String> response = controller.syncIssues(1L, false);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Synchronization successful. 0 records synchronized.", response.getBody());
+        assertEquals("0", response.getBody());
     }
 
     @Test
