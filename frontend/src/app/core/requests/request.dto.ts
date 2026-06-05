@@ -1,5 +1,6 @@
 export interface RequestRequest {
-  projectId: string;
+  projectId?: string;
+  projectName?: string;
   demandType?: string;
   title: string;
   description?: string;

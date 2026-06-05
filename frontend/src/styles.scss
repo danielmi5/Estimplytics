@@ -20,6 +20,7 @@
 @use "./styles/05-components/shared/activity-card";
 @use "./styles/05-components/shared/stat-card";
 @use "./styles/05-components/shared/notification";
+@use "./styles/05-components/shared/modal";
 @use "./styles/05-components/home";
 @use "./styles/05-components/form";
 @use "./styles/05-components/form/form-aside";
@@ -31,3 +32,4 @@
 @use "./styles/05-components/configuration/user-profile-form";
 @use "./styles/05-components/configuration/redmine-sync-form";
 @use "./styles/05-components/requests-page";
+@use "./styles/05-components/requests/request-form";

@@ -1,0 +1,79 @@
+<form
+  class="request-form"
+  [formGroup]="form"
+  aria-label="Formulario de creación de petición"
+  novalidate
+>
+
+  <app-form-input
+    id="request-project"
+    name="request-project"
+    label="Nombre del proyecto"
+    type="text"
+    placeholder="Indica el nombre del proyecto"
+    formControlName="project"
+    [required]="true"
+    [validationState]="fieldState('project')"
+    [errorMessage]="fieldMessage('project', 'error')"
+    [warningMessage]="fieldMessage('project', 'warning')"
+    [successMessage]="fieldMessage('project', 'success')"
+    [showSuccessMessage]="true"
+  />
+
+  <app-form-input
+    id="request-title"
+    name="request-title"
+    label="Título"
+    type="text"
+    placeholder="Describe brevemente la petición"
+    formControlName="title"
+    [required]="true"
+    [validationState]="fieldState('title')"
+    [errorMessage]="fieldMessage('title', 'error')"
+    [warningMessage]="fieldMessage('title', 'warning')"
+    [successMessage]="fieldMessage('title', 'success')"
+    [showSuccessMessage]="true"
+  />
+
+  <app-form-textarea
+    id="request-description"
+    name="request-description"
+    label="Descripción"
+    placeholder="Detalles adicionales de la petición"
+    formControlName="description"
+    [validationState]="fieldState('description')"
+    [errorMessage]="fieldMessage('description', 'error')"
+    [successMessage]="fieldMessage('description', 'success')"
+    [showSuccessMessage]="true"
+  />
+
+  <app-form-input
+    id="request-demand-type"
+    name="request-demand-type"
+    label="Tipo de demanda"
+    type="text"
+    placeholder="Ej. Funcionalidad, Error, Soporte..."
+    formControlName="demandType"
+    [required]="true"
+    [validationState]="fieldState('demandType')"
+    [errorMessage]="fieldMessage('demandType', 'error')"
+    [warningMessage]="fieldMessage('demandType', 'warning')"
+    [successMessage]="fieldMessage('demandType', 'success')"
+    [showSuccessMessage]="true"
+  />
+
+  <app-form-select
+    id="request-priority"
+    name="request-priority"
+    label="Prioridad"
+    formControlName="priority"
+    [required]="true"
+    [options]="priorityOptions"
+    [disabled]="state.isLoading()"
+    [validationState]="fieldState('priority')"
+    [errorMessage]="fieldMessage('priority', 'error')"
+    [warningMessage]="fieldMessage('priority', 'warning')"
+    [successMessage]="fieldMessage('priority', 'success')"
+    [showSuccessMessage]="true"
+  />
+</form>
