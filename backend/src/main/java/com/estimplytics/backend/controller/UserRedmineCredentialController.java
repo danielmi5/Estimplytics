@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,18 +38,18 @@ public class UserRedmineCredentialController {
     private final RedmineIntegrationService redmineIntegrationService;
 
     @GetMapping
-    @Operation(summary = "List current user Redmine credentials")
-    public List<UserRedmineCredentialDto> getMyCredentials(Authentication auth) {
-        User user = ownershipService.resolveCurrentUser(auth);
-        return repository.findByUser(user).stream()
-            .map(cred -> new UserRedmineCredentialDto(
+    @Operation(summary = "Get current user Redmine credential")
+    public List<UserRedmineCredentialDto> getMyCredentials() {
+        User user = ownershipService.currentUser();
+        return repository.findByUser(user)
+            .map(cred -> List.of(new UserRedmineCredentialDto(
                 cred.getId(),
                 cred.getRedmineInstance().getId(),
                 cred.getRedmineInstance().getBaseUrl(),
                 cred.getApiKey() != null ? "********" : "",
                 cred.getLastSyncAt()
-            ))
-            .toList();
+            )))
+            .orElse(List.of());
     }
 
     @PostMapping
@@ -59,12 +58,23 @@ public class UserRedmineCredentialController {
         @ApiResponse(responseCode = "200", description = "Credential saved successfully"),
         @ApiResponse(responseCode = "400", description = "Redmine URL is required")
     })
-    public ResponseEntity<Void> saveCredential(Authentication auth, @RequestBody RedmineCredentialDTO redmineCredentials) {
+    public ResponseEntity<Void> saveCredential(@RequestBody RedmineCredentialDTO redmineCredentials) {
         if (redmineCredentials.redmineUrl() == null || redmineCredentials.redmineUrl().isBlank()) {
             return ResponseEntity.badRequest().build();
         }
 
-        User user = ownershipService.resolveCurrentUser(auth);
+        User user = ownershipService.currentUser();
+
+        RedmineInstance tempInstance = new RedmineInstance();
+        tempInstance.setBaseUrl(redmineCredentials.redmineUrl());
+
+        UserRedmineCredential tempCredential = new UserRedmineCredential();
+        tempCredential.setRedmineInstance(tempInstance);
+        tempCredential.setApiKey(redmineCredentials.plainApiKey());
+
+        if (!"connected".equals(redmineIntegrationService.testConnection(tempCredential))) {
+            return ResponseEntity.badRequest().build();
+        }
 
         RedmineInstance instance = instanceRepository.findByBaseUrl(redmineCredentials.redmineUrl())
             .orElseGet(() -> {
@@ -74,17 +84,12 @@ public class UserRedmineCredentialController {
                 return instanceRepository.save(newInstance);
             });
 
-        repository.findByUser(user).stream()
-            .filter(c -> !c.getRedmineInstance().getId().equals(instance.getId()))
-            .forEach(repository::delete);
-
-        UserRedmineCredential credential = repository.findByUserAndRedmineInstance(user, instance)
-            .orElseGet(() -> {
-                UserRedmineCredential c = new UserRedmineCredential();
-                c.setUser(user);
-                c.setRedmineInstance(instance);
-                return c;
-            });
+        UserRedmineCredential credential = repository.findByUser(user).orElseGet(() -> {
+            UserRedmineCredential c = new UserRedmineCredential();
+            c.setUser(user);
+            return c;
+        });
+        credential.setRedmineInstance(instance);
 
         if (redmineCredentials.plainApiKey() != null && !redmineCredentials.plainApiKey().isBlank()) {
             credential.setApiKey(redmineCredentials.plainApiKey());
@@ -96,11 +101,11 @@ public class UserRedmineCredentialController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a Redmine credential")
-    public ResponseEntity<Void> deleteCredential(Authentication auth, @PathVariable Long id) {
+    public ResponseEntity<Void> deleteCredential(@PathVariable Long id) {
         UserRedmineCredential credential = repository.findById(id).orElse(null);
         if (credential == null) return ResponseEntity.notFound().build();
 
-        ownershipService.requireSelfOrAdmin(credential.getUser().getId(), auth);
+        ownershipService.requireUserOrAdmin(credential.getUser().getId());
         repository.delete(credential);
         return ResponseEntity.noContent().build();
     }
@@ -111,11 +116,11 @@ public class UserRedmineCredentialController {
         @ApiResponse(responseCode = "200", description = "connected | unauthorized | unreachable"),
         @ApiResponse(responseCode = "404", description = "Credential not found")
     })
-    public ResponseEntity<Map<String, String>> testConnection(Authentication auth, @PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> testConnection(@PathVariable Long id) {
         UserRedmineCredential credential = repository.findById(id).orElse(null);
         if (credential == null) return ResponseEntity.notFound().build();
 
-        ownershipService.requireSelfOrAdmin(credential.getUser().getId(), auth);
+        ownershipService.requireUserOrAdmin(credential.getUser().getId());
         return ResponseEntity.ok(Map.of("status", redmineIntegrationService.testConnection(credential)));
     }
 }

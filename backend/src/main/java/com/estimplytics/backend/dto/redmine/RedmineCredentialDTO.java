@@ -1,8 +1,10 @@
 package com.estimplytics.backend.dto.redmine;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 public record RedmineCredentialDTO(
+        @NotBlank
         @Schema(description = "Redmine base URL", example = "https://redmine.mycompany.com")
         String redmineUrl,
 
