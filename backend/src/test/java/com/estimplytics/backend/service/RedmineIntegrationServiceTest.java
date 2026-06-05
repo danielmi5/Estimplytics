@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.estimplytics.backend.dto.redmine.RedmineIssueResponseDTO;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -56,7 +56,7 @@ class RedmineIntegrationServiceTest {
         when(restClient.get()).thenReturn(uriSpec);
         when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenReturn(new RedmineIssueResponseDTO());
 
         String result = service.testConnection(buildCredential("https://redmine.example.com", null));
 
@@ -72,7 +72,7 @@ class RedmineIntegrationServiceTest {
         when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.header(eq("X-Redmine-API-Key"), anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenReturn(new RedmineIssueResponseDTO());
 
         String result = service.testConnection(buildCredential("https://redmine.example.com", "secret-key"));
 
@@ -87,7 +87,7 @@ class RedmineIntegrationServiceTest {
         when(restClient.get()).thenReturn(uriSpec);
         when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenThrow(HttpClientErrorException.create(
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenThrow(HttpClientErrorException.create(
                 HttpStatus.UNAUTHORIZED, "Unauthorized", null, null, null));
 
         String result = service.testConnection(buildCredential("https://redmine.example.com", null));
@@ -103,7 +103,7 @@ class RedmineIntegrationServiceTest {
         when(restClient.get()).thenReturn(uriSpec);
         when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenThrow(HttpClientErrorException.create(
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenThrow(HttpClientErrorException.create(
                 HttpStatus.FORBIDDEN, "Forbidden", null, null, null));
 
         String result = service.testConnection(buildCredential("https://redmine.example.com", null));
@@ -119,7 +119,7 @@ class RedmineIntegrationServiceTest {
         when(restClient.get()).thenReturn(uriSpec);
         when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenThrow(new ResourceAccessException("Connection refused"));
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenThrow(new ResourceAccessException("Connection refused"));
 
         String result = service.testConnection(buildCredential("https://unreachable.invalid", null));
 
@@ -134,7 +134,7 @@ class RedmineIntegrationServiceTest {
         when(restClient.get()).thenReturn(uriSpec);
         when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenThrow(HttpClientErrorException.create(
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenThrow(HttpClientErrorException.create(
                 HttpStatus.TOO_MANY_REQUESTS, "Too Many Requests", null, null, null));
 
         String result = service.testConnection(buildCredential("https://redmine.example.com", null));
@@ -148,9 +148,9 @@ class RedmineIntegrationServiceTest {
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(restClient.get()).thenReturn(uriSpec);
-        when(uriSpec.uri("https://redmine.example.com/issues.json?limit=1")).thenReturn(uriSpec);
+        when(uriSpec.uri(anyString())).thenReturn(uriSpec);
         when(uriSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.toBodilessEntity()).thenReturn(ResponseEntity.ok().build());
+        when(responseSpec.body(RedmineIssueResponseDTO.class)).thenReturn(new RedmineIssueResponseDTO());
 
         String result = service.testConnection(buildCredential("https://redmine.example.com/", null));
 

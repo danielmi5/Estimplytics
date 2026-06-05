@@ -31,15 +31,23 @@ public class RedmineIntegrationService {
         this.ownershipService = ownershipService;
     }
 
-    public String testConnection(UserRedmineCredential credential) {
-        String base = credential.getRedmineInstance().getBaseUrl().replaceAll("/+$", "");
-        try {
-            var spec = restClient.get().uri(base + "/issues.json?limit=1");
-            String key = credential.getApiKey();
+    public String resolveBaseUrl(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return baseUrl;
+        }
+        String url = baseUrl.trim().replaceAll("/+$", "");
+        if (url.equalsIgnoreCase("http://redmine.org") || url.equalsIgnoreCase("https://redmine.org")) {
+            return "https://www.redmine.org";
+        }
+        return url;
+    }
 
-            if (key != null && !key.isBlank()) spec = spec.header("X-Redmine-API-Key", key);
-            
-            spec.retrieve().toBodilessEntity();
+    public String testConnection(UserRedmineCredential credential) {
+        String base = resolveBaseUrl(credential.getRedmineInstance().getBaseUrl());
+        try {
+            applyApiKey(restClient.get().uri(base + "/issues.json?limit=1"), credential.getApiKey())
+                    .retrieve()
+                    .body(RedmineIssueResponseDTO.class);
             return "connected";
         } catch (HttpClientErrorException e) {
             int code = e.getStatusCode().value();
@@ -59,19 +67,16 @@ public class RedmineIntegrationService {
         Integer totalCount = null;
 
         try {
+            String baseUrl = resolveBaseUrl(credential.getRedmineInstance().getBaseUrl());
+
             do {
-                String apiUrl = "%s/issues.json?status_id=*&limit=%d&offset=%d".formatted(
-                        credential.getRedmineInstance().getBaseUrl(), limit, offset);
+                String apiUrl = "%s/issues.json?status_id=*&limit=%d&offset=%d".formatted(baseUrl, limit, offset);
 
                 if (!fullSync && credential.getLastSyncAt() != null) {
                     apiUrl += "&updated_on=>=" + RedmineDateFormatter.formatUpdatedOnFilter(credential.getLastSyncAt());
                 }
 
-                RedmineIssueResponseDTO response = restClient.get()
-                        .uri(apiUrl)
-                        .header("X-Redmine-API-Key", credential.getApiKey())
-                        .retrieve()
-                        .body(RedmineIssueResponseDTO.class);
+                RedmineIssueResponseDTO response = applyApiKey(restClient.get().uri(apiUrl), credential.getApiKey()).retrieve().body(RedmineIssueResponseDTO.class);
 
                 if (response == null || response.getIssues() == null || response.getIssues().isEmpty()) {
                     break;
@@ -112,5 +117,12 @@ public class RedmineIntegrationService {
         } catch (Exception e) {
             throw new RedmineIntegrationException("Failed to process Redmine response: %s".formatted(e.getMessage()), e, ErrorType.INVALID_PAYLOAD);
         }
+    }
+
+    private RestClient.RequestHeadersSpec<?> applyApiKey(RestClient.RequestHeadersSpec<?> spec, String apiKey) {
+        if (apiKey != null && !apiKey.isBlank()) {
+            return spec.header("X-Redmine-API-Key", apiKey);
+        }
+        return spec;
     }
 }

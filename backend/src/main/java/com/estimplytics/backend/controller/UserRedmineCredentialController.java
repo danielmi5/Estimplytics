@@ -63,10 +63,11 @@ public class UserRedmineCredentialController {
             return ResponseEntity.badRequest().build();
         }
 
+        String normalizedUrl = redmineIntegrationService.resolveBaseUrl(redmineCredentials.redmineUrl());
         User user = ownershipService.currentUser();
 
         RedmineInstance tempInstance = new RedmineInstance();
-        tempInstance.setBaseUrl(redmineCredentials.redmineUrl());
+        tempInstance.setBaseUrl(normalizedUrl);
 
         UserRedmineCredential tempCredential = new UserRedmineCredential();
         tempCredential.setRedmineInstance(tempInstance);
@@ -76,11 +77,11 @@ public class UserRedmineCredentialController {
             return ResponseEntity.badRequest().build();
         }
 
-        RedmineInstance instance = instanceRepository.findByBaseUrl(redmineCredentials.redmineUrl())
+        RedmineInstance instance = instanceRepository.findByBaseUrl(normalizedUrl)
             .orElseGet(() -> {
                 RedmineInstance newInstance = new RedmineInstance();
-                newInstance.setName(redmineCredentials.redmineUrl());
-                newInstance.setBaseUrl(redmineCredentials.redmineUrl());
+                newInstance.setName(normalizedUrl);
+                newInstance.setBaseUrl(normalizedUrl);
                 return instanceRepository.save(newInstance);
             });
 
@@ -91,8 +92,8 @@ public class UserRedmineCredentialController {
         });
         credential.setRedmineInstance(instance);
 
-        if (redmineCredentials.plainApiKey() != null && !redmineCredentials.plainApiKey().isBlank()) {
-            credential.setApiKey(redmineCredentials.plainApiKey());
+        if (redmineCredentials.plainApiKey() != null) {
+            credential.setApiKey(redmineCredentials.plainApiKey().isBlank() ? null : redmineCredentials.plainApiKey());
         }
 
         repository.save(credential);
