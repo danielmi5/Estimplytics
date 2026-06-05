@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { Button } from '../button/button';
+import { buildPaginationItems } from './pagination-items.util';
 
 @Component({
   selector: 'app-pagination',
@@ -25,7 +26,7 @@ export class Pagination {
     return end - start + 1;
   });
 
-  readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index));
+  readonly pageItems = computed(() => buildPaginationItems(this.page(), this.totalPages()));
 
   goToPage(page: number): void {
     if (page < 0 || page >= this.totalPages() || page === this.page()) {

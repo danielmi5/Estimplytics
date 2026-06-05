@@ -14,14 +14,24 @@
         (pressed)="goToPage(page() - 1)"
       />
 
-      @for (pageNumber of pages(); track pageNumber) {
-        <app-button
-          [variant]="pageNumber === page() ? 'primary' : 'secondary'"
-          size="sm"
-          [label]="'' + (pageNumber + 1)"
-          [ariaLabel]="'Página ' + (pageNumber + 1)"
-          (pressed)="goToPage(pageNumber)"
-        />
+      @for (item of pageItems(); track $index) {
+        @if (item.kind === 'separator') {
+          <app-button
+            variant="secondary"
+            size="sm"
+            label="…"
+            ariaLabel="Más páginas"
+            [disabled]="true"
+          />
+        } @else {
+          <app-button
+            [variant]="item.page === page() ? 'primary' : 'secondary'"
+            size="sm"
+            [label]="'' + (item.page + 1)"
+            [ariaLabel]="'Página ' + (item.page + 1)"
+            (pressed)="goToPage(item.page)"
+          />
+        }
       }
 
       <app-button
