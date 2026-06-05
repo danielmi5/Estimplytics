@@ -1,0 +1,107 @@
+@use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
+
+.form-select {
+  width: 100%;
+
+  @include mixins.flex(column, $spacing-sm);
+
+  &__label {
+    @include mixins.flex(row, $spacing-xs, flex-start, center);
+
+    &-text {
+      @include mixins.typography(small, var(--card-label));
+      font-weight: $font-weight-500;
+    }
+
+    &-required {
+      color: var(--color-warning);
+      font-weight: $font-weight-700;
+    }
+  }
+
+  &__input-container {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    @include mixins.flex(row, $spacing-sm, flex-start, center);
+    border-bottom: $border-medium solid $color-neutral-3;
+    transition: border-color $transition-fast ease-in-out, background $transition-fast ease-in-out;
+
+    &:hover {
+      background: $color-neutral-1;
+    }
+
+    &:focus-within {
+      border-bottom-color: var(--border-input-focus);
+      background: transparent;
+    }
+  }
+
+  &__field {
+    flex: 1;
+    width: 100%;
+    padding: $spacing-sm 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-secondary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    appearance: none;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__icon {
+    @include mixins.flex-center();
+    width: 14px;
+    height: 14px;
+    color: var(--card-label);
+    pointer-events: none;
+
+    &--right {
+      margin-left: auto;
+    }
+  }
+
+  &__message {
+    @include mixins.typography(small, var(--card-label));
+
+    &--warning { color: var(--color-warning); }
+    &--error { color: var(--color-error); }
+    &--success { color: var(--color-success); }
+  }
+
+  &--success {
+    .form-select__input-container { border-color: var(--color-success); }
+    .form-select__label-text,
+    .form-select__icon { color: var(--color-success); }
+  }
+
+  &--warning {
+    .form-select__input-container { border-color: var(--color-warning); }
+    .form-select__label-text,
+    .form-select__icon { color: var(--color-warning); }
+  }
+
+  &--error {
+    .form-select__input-container { border-color: var(--color-error); }
+    .form-select__label-text,
+    .form-select__icon { color: var(--color-error); }
+  }
+
+  &--disabled {
+    @include mixins.disabled();
+
+    .form-select__input-container {
+      border-color: var(--border);
+      background: var(--bg);
+    }
+  }
+}

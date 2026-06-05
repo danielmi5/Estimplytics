@@ -1,0 +1,95 @@
+@use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
+
+.form-textarea {
+  width: 100%;
+
+  @include mixins.flex(column, $spacing-sm);
+
+  &__label {
+    @include mixins.flex(row, $spacing-xs, flex-start, center);
+
+    &-text {
+      @include mixins.typography(small, var(--card-label));
+      font-weight: $font-weight-500;
+    }
+
+    &-required {
+      color: var(--color-warning);
+      font-weight: $font-weight-700;
+    }
+  }
+
+  &__input-container {
+    width: 100%;
+    min-width: 0;
+    border-bottom: $border-medium solid $color-neutral-3;
+    transition: border-color $transition-fast ease-in-out, background $transition-fast ease-in-out;
+
+    &:hover {
+      background: $color-neutral-1;
+    }
+
+    &:focus-within {
+      border-bottom-color: var(--border-input-focus);
+      background: transparent;
+    }
+  }
+
+  &__field {
+    width: 100%;
+    min-height: 6rem;
+    padding: $spacing-sm 0;
+    border: none;
+    outline: none;
+    resize: vertical;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-secondary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+
+    &::placeholder {
+      color: $color-neutral-3;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__message {
+    @include mixins.typography(small, var(--card-label));
+
+    &--warning { color: var(--color-warning); }
+    &--error { color: var(--color-error); }
+    &--success { color: var(--color-success); }
+  }
+
+  &--success {
+    .form-textarea__input-container { border-color: var(--color-success); }
+    .form-textarea__label-text { color: var(--color-success); }
+    .form-textarea__field::placeholder { color: var(--color-success); }
+  }
+
+  &--warning {
+    .form-textarea__input-container { border-color: var(--color-warning); }
+    .form-textarea__label-text { color: var(--color-warning); }
+  }
+
+  &--error {
+    .form-textarea__input-container { border-color: var(--color-error); }
+    .form-textarea__label-text { color: var(--color-error); }
+    .form-textarea__field::placeholder { color: var(--color-error); }
+  }
+
+  &--disabled {
+    @include mixins.disabled();
+
+    .form-textarea__input-container {
+      border-color: var(--border);
+      background: var(--bg);
+    }
+  }
+}

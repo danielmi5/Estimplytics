@@ -1,0 +1,55 @@
+<div
+  class="form-textarea"
+  [class.form-textarea--success]="getEffectiveState() === 'success'"
+  [class.form-textarea--warning]="getEffectiveState() === 'warning'"
+  [class.form-textarea--error]="getEffectiveState() === 'error'"
+  [class.form-textarea--disabled]="isDisabled()"
+>
+  <label class="form-textarea__label" [for]="id()">
+    <span class="form-textarea__label-text">{{ label() }}</span>
+    @if (required()) {
+      <span class="form-textarea__label-required" aria-hidden="true">*</span>
+    }
+  </label>
+
+  <div class="form-textarea__input-container">
+    <textarea
+      class="form-textarea__field"
+      [id]="id()"
+      [name]="name()"
+      [rows]="rows()"
+      [placeholder]="placeholder()"
+      [disabled]="isDisabled()"
+      [value]="value"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+      [attr.aria-disabled]="isDisabled() ? 'true' : null"
+      [attr.aria-required]="required() ? 'true' : null"
+      [attr.aria-invalid]="getEffectiveState() === 'error' ? 'true' : 'false'"
+      [attr.aria-describedby]="id() + '-message'"
+      [required]="required()"
+    ></textarea>
+  </div>
+
+  @if (getEffectiveState() === 'initial' && helpText()) {
+    <small class="form-textarea__message" [id]="id() + '-message'">{{ helpText() }}</small>
+  }
+
+  @if (getEffectiveState() === 'warning' && warningMessage()) {
+    <small class="form-textarea__message form-textarea__message--warning" [id]="id() + '-message'" role="alert">
+      {{ warningMessage() }}
+    </small>
+  }
+
+  @if (getEffectiveState() === 'error' && errorMessage()) {
+    <small class="form-textarea__message form-textarea__message--error" [id]="id() + '-message'" role="alert">
+      {{ errorMessage() }}
+    </small>
+  }
+
+  @if (getEffectiveState() === 'success' && showSuccessMessage()) {
+    <small class="form-textarea__message form-textarea__message--success" [id]="id() + '-message'">
+      {{ successMessage() }}
+    </small>
+  }
+</div>
