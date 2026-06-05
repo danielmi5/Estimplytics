@@ -16,7 +16,7 @@ public class RedmineIssueMapper {
 
     public void updateEntityAndMetadataFromDto(RedmineIssueDTO dto, Request request, RedmineIssueMetadata metadata) {
         metadata.setRedmineId(dto.getId());
-        metadata.setOriginRequestCode("REDMINE-%s".formatted(dto.getId()));
+        request.setOriginRequestCode("REDMINE-%s".formatted(dto.getId()));
 
         if (dto.getProject() == null || dto.getProject().getName() == null || dto.getProject().getName().isBlank()) {
             throw new RedmineMandatoryFieldException("Project is required but was null or empty in Redmine issue %s".formatted(dto.getId()));

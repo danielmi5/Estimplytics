@@ -5,13 +5,11 @@ import com.estimplytics.backend.dto.EstimationResponseDTO;
 import com.estimplytics.backend.dto.EstimationUpdateDTO;
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
 import com.estimplytics.backend.entity.Estimation;
-import com.estimplytics.backend.entity.RedmineIssueMetadata;
 import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.EstimationNotFoundException;
 import com.estimplytics.backend.mapper.EstimationMapper;
 import com.estimplytics.backend.repository.EstimationRepository;
 import com.estimplytics.backend.repository.ImpactAnalysisRepository;
-import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
 import com.estimplytics.backend.repository.RequestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,17 +26,15 @@ public class EstimationService implements IEstimationService {
     private final EstimationMapper mapper;
     private final EstimationAlgorithmService estimationAlgorithmService;
     private final ExcelGeneratorService excelGeneratorService;
-    private final RedmineIssueMetadataRepository redmineIssueMetadataRepository;
     private final ImpactAnalysisRepository impactAnalysisRepository;
     private final RequestRepository requestRepository;
     private final OwnershipService ownershipService;
 
-    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService, ExcelGeneratorService excelGeneratorService, RedmineIssueMetadataRepository redmineIssueMetadataRepository, ImpactAnalysisRepository impactAnalysisRepository, RequestRepository requestRepository, OwnershipService ownershipService) {
+    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService, ExcelGeneratorService excelGeneratorService, ImpactAnalysisRepository impactAnalysisRepository, RequestRepository requestRepository, OwnershipService ownershipService) {
         this.repository = repository;
         this.mapper = mapper;
         this.estimationAlgorithmService = estimationAlgorithmService;
         this.excelGeneratorService = excelGeneratorService;
-        this.redmineIssueMetadataRepository = redmineIssueMetadataRepository;
         this.impactAnalysisRepository = impactAnalysisRepository;
         this.requestRepository = requestRepository;
         this.ownershipService = ownershipService;
@@ -117,6 +113,6 @@ public class EstimationService implements IEstimationService {
     private String originRequestCode(Estimation estimation) {
         if (estimation.getAnalysis() == null || estimation.getAnalysis().getRequest() == null) return "";
         UUID requestId = estimation.getAnalysis().getRequest().getId();
-        return redmineIssueMetadataRepository.findByRequestId(requestId).map(RedmineIssueMetadata::getOriginRequestCode).orElse("");
+        return requestRepository.findById(requestId).map(Request::getOriginRequestCode).orElse("");
     }
 }

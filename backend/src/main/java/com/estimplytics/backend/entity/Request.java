@@ -54,6 +54,9 @@ public class Request {
     @Column(name = "spent_hours")
     private Double spentHours;
 
+    @Column(name = "origin_request_code", length = 100)
+    private String originRequestCode;
+
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 

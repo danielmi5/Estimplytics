@@ -14,13 +14,16 @@ import java.util.UUID;
 public interface RequestRepository extends JpaRepository<Request, UUID> {
     boolean existsByProjectId(UUID projectId);
 
+    @Query("SELECT COUNT(r) FROM Request r WHERE r.project.id = :projectId AND r.redmineMetadata IS NULL")
+    long countManualByProjectId(@Param("projectId") UUID projectId);
+
     @Query("""
             SELECT DISTINCT r FROM Request r
             LEFT JOIN r.redmineMetadata m
             LEFT JOIN r.project p
             WHERE LOWER(r.title) LIKE LOWER(CONCAT('%', :search, '%'))
             OR LOWER(COALESCE(p.name, m.projectName, '')) LIKE LOWER(CONCAT('%', :search, '%'))
-            OR LOWER(COALESCE(m.originRequestCode, '')) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(COALESCE(r.originRequestCode, '')) LIKE LOWER(CONCAT('%', :search, '%'))
             """)
     Page<Request> searchAll(@Param("search") String search, Pageable pageable);
 
@@ -44,6 +47,7 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
             AND (
                 LOWER(r.title) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(COALESCE(p.name, '')) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(COALESCE(r.originRequestCode, '')) LIKE LOWER(CONCAT('%', :search, '%'))
             )
             """)
     Page<Request> searchManualAccessible(@Param("userId") UUID userId, @Param("search") String search, Pageable pageable);
@@ -68,7 +72,7 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
             WHERE (
                 LOWER(r.title) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(COALESCE(p.name, m.projectName, '')) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(COALESCE(m.originRequestCode, '')) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(COALESCE(r.originRequestCode, '')) LIKE LOWER(CONCAT('%', :search, '%'))
             )
             AND (
                 (m IS NULL AND (ro.id = :userId OR po.id = :userId))

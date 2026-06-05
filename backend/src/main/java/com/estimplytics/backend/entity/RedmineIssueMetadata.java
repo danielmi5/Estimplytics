@@ -37,9 +37,6 @@ public class RedmineIssueMetadata {
     @Column(name = "project_name", length = 100)
     private String projectName;
 
-    @Column(name = "origin_request_code", length = 50)
-    private String originRequestCode;
-
     @Column(name = "raw_tracker", length = 100)
     private String rawTracker;
 

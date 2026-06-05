@@ -40,6 +40,14 @@ public class RequestMapper implements IMapper<Request, RequestRequestDTO, Reques
                 .orElseThrow(() -> new ProjectNotFoundException(
                         "Project not found with id %s".formatted(dto.getProjectId())));
 
+        return toEntity(dto, project);
+    }
+
+    public Request toEntity(RequestRequestDTO dto, Project project) {
+        if (dto == null) {
+            return null;
+        }
+
         Request entity = new Request();
         entity.setProject(project);
         entity.setTitle(dto.getTitle());
@@ -112,6 +120,10 @@ public class RequestMapper implements IMapper<Request, RequestRequestDTO, Reques
                     .projectName(project.getName());
         }
 
+        if (entity.getOriginRequestCode() != null) {
+            builder.originRequestCode(entity.getOriginRequestCode());
+        }
+
         if (metadata != null) {
             applyMetadata(builder, metadata, project == null);
         }
@@ -139,7 +151,6 @@ public class RequestMapper implements IMapper<Request, RequestRequestDTO, Reques
                                RedmineIssueMetadata metadata,
                                boolean includeProjectName) {
         builder.redmineId(metadata.getRedmineId())
-                .originRequestCode(metadata.getOriginRequestCode())
                 .assigneeName(metadata.getAssigneeName())
                 .authorName(metadata.getAuthorName())
                 .redmineCreatedDate(metadata.getRedmineCreatedDate())

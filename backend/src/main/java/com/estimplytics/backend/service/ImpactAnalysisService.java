@@ -104,7 +104,7 @@ public class ImpactAnalysisService implements IImpactAnalysisService {
 
     private String originRequestCode(ImpactAnalysis analysis) {
         if (analysis.getRequest() == null) return "";
-        return redmineIssueMetadataRepository.findByRequestId(analysis.getRequest().getId()).map(RedmineIssueMetadata::getOriginRequestCode).orElse("");
+        return analysis.getRequest().getOriginRequestCode() != null ? analysis.getRequest().getOriginRequestCode() : "";
     }
 
     private static String orEmpty(Object value) {

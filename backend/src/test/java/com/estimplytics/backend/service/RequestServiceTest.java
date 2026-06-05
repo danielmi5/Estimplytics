@@ -9,6 +9,7 @@ import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.entity.User;
 import com.estimplytics.backend.exception.RequestNotFoundException;
 import com.estimplytics.backend.mapper.RequestMapper;
+import com.estimplytics.backend.repository.ProjectRepository;
 import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
 import com.estimplytics.backend.repository.RequestRepository;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,9 @@ class RequestServiceTest {
 
     @Mock
     private OwnershipService ownershipService;
+
+    @Mock
+    private ProjectRepository projectRepository;
 
     @InjectMocks
     private RequestService service;
@@ -132,8 +136,13 @@ class RequestServiceTest {
         Request saved = mock(Request.class);
         RequestResponseDTO response = mock(RequestResponseDTO.class);
         User owner = mock(User.class);
-        when(mapper.toEntity(request)).thenReturn(entity);
-        when(entity.getProject()).thenReturn(project);
+        UUID projectId = UUID.randomUUID();
+        when(request.getProjectId()).thenReturn(projectId);
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(project.getId()).thenReturn(projectId);
+        when(project.getName()).thenReturn("Portal Clientes");
+        when(repository.countManualByProjectId(projectId)).thenReturn(0L);
+        when(mapper.toEntity(request, project)).thenReturn(entity);
         when(ownershipService.isAdmin()).thenReturn(false);
         when(ownershipService.currentUser()).thenReturn(owner);
         when(repository.save(entity)).thenReturn(saved);
@@ -143,6 +152,7 @@ class RequestServiceTest {
 
         assertThat(result).isSameAs(response);
         verify(ownershipService).requireOwnedProject(project);
+        verify(entity).setOriginRequestCode("Portal Clientes-00001");
         verify(entity).setOwner(owner);
     }
 

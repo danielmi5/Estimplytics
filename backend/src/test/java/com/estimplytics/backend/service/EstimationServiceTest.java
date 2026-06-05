@@ -11,7 +11,6 @@ import com.estimplytics.backend.exception.EstimationNotFoundException;
 import com.estimplytics.backend.mapper.EstimationMapper;
 import com.estimplytics.backend.repository.EstimationRepository;
 import com.estimplytics.backend.repository.ImpactAnalysisRepository;
-import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
 import com.estimplytics.backend.repository.RequestRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,9 +46,6 @@ class EstimationServiceTest {
 
     @Mock
     private ExcelGeneratorService excelGeneratorService;
-
-    @Mock
-    private RedmineIssueMetadataRepository redmineIssueMetadataRepository;
 
     @Mock
     private ImpactAnalysisRepository impactAnalysisRepository;
