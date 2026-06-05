@@ -27,7 +27,7 @@ export class Sidebar {
   readonly navItems: NavItem[] = [
     { label: 'Dashboard', route: '/', icon: 'home', exact: true  },
     { label: 'Peticiones', route: '/requests', icon: 'pie-chart', exact: false },
-    { label: 'Análisis', route: '/analytics', icon: 'slack', exact: false },
+    { label: 'Análisis', route: '/analysis', icon: 'slack', exact: false },
     { label: 'Historial', route: '/history', icon: 'layers', exact: false },
     { label: 'Configuración', route: '/configuration', icon: 'settings', exact: false },
 ];

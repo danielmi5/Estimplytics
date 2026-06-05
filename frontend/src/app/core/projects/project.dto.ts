@@ -8,6 +8,7 @@ export interface ProjectResponse {
   name: string;
   description?: string;
   createdAt: string;
+  ownerId?: string;
 }
 
 export interface ProjectUpdate {

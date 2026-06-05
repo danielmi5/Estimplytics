@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Activity } from '../../components/home/activity/activity';
-import { DashboardHero } from '../../components/home/hero/welcome';
+import { Welcome } from '../../components/home/welcome/welcome';
 import { MetricsSummary } from '../../components/home/kpis/metrics-summary';
 import { Requests } from '../../components/home/requests/requests';
 import { Stats } from '../../components/home/stats/stats';
@@ -8,7 +8,7 @@ import { ActivityItem, KpiCard, StatMetric, SummaryMetric } from './home.models'
 
 @Component({
   selector: 'app-home',
-  imports: [Activity, DashboardHero, MetricsSummary, Requests, Stats],
+  imports: [Activity, Welcome, MetricsSummary, Requests, Stats],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -34,4 +34,12 @@ export class RequestsApiService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  lock(id: string): Observable<RequestResponse> {
+    return this.http.post<RequestResponse>(`${this.baseUrl}/${id}/lock`, null);
+  }
+
+  unlock(id: string): Observable<RequestResponse> {
+    return this.http.post<RequestResponse>(`${this.baseUrl}/${id}/unlock`, null);
+  }
 }

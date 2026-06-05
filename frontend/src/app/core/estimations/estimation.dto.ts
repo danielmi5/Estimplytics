@@ -2,9 +2,10 @@ export interface EstimationRequest {
   analysisId: string;
   versionNumber: number;
   fiability?: number;
-  hoursAn?: number;
-  hoursAs?: number;
-  hoursDe?: number;
+  hoursPlanning?: number;
+  hoursAnalysis?: number;
+  hoursDevelopment?: number;
+  hoursTesting?: number;
   totalHours?: number;
   actualHoursFeedback?: number;
   justification?: string;
@@ -16,9 +17,10 @@ export interface EstimationResponse {
   analysisId: string;
   versionNumber: number;
   fiability?: number;
-  hoursAn?: number;
-  hoursAs?: number;
-  hoursDe?: number;
+  hoursPlanning?: number;
+  hoursAnalysis?: number;
+  hoursDevelopment?: number;
+  hoursTesting?: number;
   totalHours?: number;
   actualHoursFeedback?: number;
   justification?: string;
@@ -29,9 +31,10 @@ export interface EstimationResponse {
 export interface EstimationUpdate {
   versionNumber: number;
   fiability?: number;
-  hoursAn?: number;
-  hoursAs?: number;
-  hoursDe?: number;
+  hoursPlanning?: number;
+  hoursAnalysis?: number;
+  hoursDevelopment?: number;
+  hoursTesting?: number;
   totalHours?: number;
   actualHoursFeedback?: number;
   justification?: string;
