@@ -39,12 +39,26 @@ export class RedmineSyncForm implements OnInit {
   onSubmit(): void {
     const { redmineUrl, apiKey } = this.form.getRawValue();
 
-    if (!redmineUrl.trim()) return;
+    if (!redmineUrl.trim()) {
+      const cred = this.redmineService.primaryCredential();
+      if (cred) {
+        this.redmineService.deleteCredential(cred.id);
+      }
+
+      this.form.patchValue({ redmineUrl: '', apiKey: '' });
+      this.form.markAsPristine();
+      return;
+    }
+
+    const request: { redmineUrl: string; plainApiKey?: string } = {
+      redmineUrl: redmineUrl.trim(),
+    };
+
+    if (this.apiKeyCtrl.dirty) {
+      request.plainApiKey = apiKey.trim();
+    }
 
     this.form.markAsPristine();
-    this.redmineService.save({
-      redmineUrl: redmineUrl.trim(),
-      plainApiKey: apiKey.trim() || undefined,
-    });
+    this.redmineService.save(request);
   }
 }
