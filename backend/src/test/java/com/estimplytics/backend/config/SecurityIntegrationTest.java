@@ -113,13 +113,13 @@ public class SecurityIntegrationTest {
     }
 
     @Test
-    public void analyst_CanGetRequests_ButNotDelete() throws Exception {
+    public void analyst_CanGetRequests_ButNotAccessAdminEndpoints() throws Exception {
         createTestUser(Role.ANALYST);
         String token = loginAndGetToken("analyst@estymplytics.es", "Zx23edfzTF");
 
         mockMvc.perform(get("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/components").header("Authorization", "Bearer " + token)).andExpect(status().isForbidden());
     }
 
     @Test
