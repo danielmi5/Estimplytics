@@ -35,6 +35,14 @@ public class ImpactAnalysis {
     @OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Estimation> estimations = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComponentAnalysis> componentAnalyses = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImpactAnalysisHistory> histories = new ArrayList<>();
+
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber;
 

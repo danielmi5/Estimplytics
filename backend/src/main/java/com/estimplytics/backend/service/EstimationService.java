@@ -6,10 +6,13 @@ import com.estimplytics.backend.dto.EstimationUpdateDTO;
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
 import com.estimplytics.backend.entity.Estimation;
 import com.estimplytics.backend.entity.RedmineIssueMetadata;
+import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.EstimationNotFoundException;
 import com.estimplytics.backend.mapper.EstimationMapper;
 import com.estimplytics.backend.repository.EstimationRepository;
+import com.estimplytics.backend.repository.ImpactAnalysisRepository;
 import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
+import com.estimplytics.backend.repository.RequestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,14 +29,19 @@ public class EstimationService implements IEstimationService {
     private final EstimationAlgorithmService estimationAlgorithmService;
     private final ExcelGeneratorService excelGeneratorService;
     private final RedmineIssueMetadataRepository redmineIssueMetadataRepository;
+    private final ImpactAnalysisRepository impactAnalysisRepository;
+    private final RequestRepository requestRepository;
+    private final OwnershipService ownershipService;
 
-    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService, ExcelGeneratorService excelGeneratorService, RedmineIssueMetadataRepository redmineIssueMetadataRepository
-    ) {
+    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService, ExcelGeneratorService excelGeneratorService, RedmineIssueMetadataRepository redmineIssueMetadataRepository, ImpactAnalysisRepository impactAnalysisRepository, RequestRepository requestRepository, OwnershipService ownershipService) {
         this.repository = repository;
         this.mapper = mapper;
         this.estimationAlgorithmService = estimationAlgorithmService;
         this.excelGeneratorService = excelGeneratorService;
         this.redmineIssueMetadataRepository = redmineIssueMetadataRepository;
+        this.impactAnalysisRepository = impactAnalysisRepository;
+        this.requestRepository = requestRepository;
+        this.ownershipService = ownershipService;
     }
 
     @Override
@@ -57,14 +65,15 @@ public class EstimationService implements IEstimationService {
         dto.setTotalHours(estimationAlgorithmResult.getSuggestedTotalHours());
         dto.setFiability(estimationAlgorithmResult.getFiabilityPercentage());
         Estimation entity = mapper.toEntity(dto);
-        Estimation savedEntity = repository.save(entity);
-        return mapper.toResponseDTO(savedEntity);
+        requireEditAndRenew(entity);
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
     @Transactional
     public EstimationResponseDTO update(UUID id, EstimationUpdateDTO dto) {
         return repository.findById(id).map(entity -> {
+            requireEditAndRenew(entity);
             mapper.updateEntityFromDTO(dto, entity);
             return mapper.toResponseDTO(repository.save(entity));
         }).orElseThrow(() -> new EstimationNotFoundException("Estimation not found with id %s".formatted(id)));
@@ -73,9 +82,7 @@ public class EstimationService implements IEstimationService {
     @Override
     @Transactional
     public void delete(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new EstimationNotFoundException("Estimation not found with id %s".formatted(id));
-        }
+        if (!repository.existsById(id)) throw new EstimationNotFoundException("Estimation not found with id %s".formatted(id));
         repository.deleteById(id);
     }
 
@@ -83,20 +90,33 @@ public class EstimationService implements IEstimationService {
     @Transactional(readOnly = true)
     public Optional<ExcelExport> exportExcel(UUID id) {
         return repository.findById(id).map(estimation -> {
-            String originRequestCode = resolveOriginRequestCode(estimation);
-            byte[] content = excelGeneratorService.exportEstimation(estimation, originRequestCode);
-            String filename = "Estimation-" + originRequestCode + ".xlsx";
-            return new ExcelExport(content, filename);
+            String code = originRequestCode(estimation);
+            byte[] content = excelGeneratorService.exportEstimation(estimation, code);
+            return new ExcelExport(content, "Estimation-%s.xlsx".formatted(code));
         });
     }
 
-    private String resolveOriginRequestCode(Estimation estimation) {
-        if (estimation.getAnalysis() == null || estimation.getAnalysis().getRequest() == null) {
-            return "";
+    private void requireEditAndRenew(Estimation estimation) {
+        Request request = parentRequest(estimation);
+        ownershipService.requireEditAndRenew(request);
+        requestRepository.save(request);
+    }
+
+    private Request parentRequest(Estimation estimation) {
+        if (estimation.getAnalysis() == null || estimation.getAnalysis().getId() == null) {
+            throw new IllegalStateException("Estimation must be linked to an impact analysis");
         }
+        return impactAnalysisRepository.findById(estimation.getAnalysis().getId()).map(analysis -> {
+            if (analysis.getRequest() == null || analysis.getRequest().getId() == null) {
+                throw new IllegalStateException("Impact analysis must be linked to a request");
+            }
+            return requestRepository.findById(analysis.getRequest().getId()).orElseThrow(() -> new IllegalStateException("Parent request not found"));
+        }).orElseThrow(() -> new IllegalStateException("Impact analysis not found"));
+    }
+
+    private String originRequestCode(Estimation estimation) {
+        if (estimation.getAnalysis() == null || estimation.getAnalysis().getRequest() == null) return "";
         UUID requestId = estimation.getAnalysis().getRequest().getId();
-        return redmineIssueMetadataRepository.findByRequestId(requestId)
-            .map(RedmineIssueMetadata::getOriginRequestCode)
-            .orElse("");
+        return redmineIssueMetadataRepository.findByRequestId(requestId).map(RedmineIssueMetadata::getOriginRequestCode).orElse("");
     }
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,6 +23,10 @@ public class Estimation {
     @ManyToOne
     @JoinColumn(name = "analysis_id", nullable = false)
     private ImpactAnalysis analysis;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "estimation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EstimationHistory> histories = new ArrayList<>();
 
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber;
