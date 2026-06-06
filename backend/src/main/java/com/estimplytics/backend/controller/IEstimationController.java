@@ -13,6 +13,9 @@ import java.util.UUID;
 @RequestMapping("/api/estimations")
 public interface IEstimationController extends ICrudController<EstimationRequestDTO, EstimationResponseDTO, EstimationUpdateDTO, UUID> {
 
+    @GetMapping("/analysis/{analysisId}")
+    ResponseEntity<EstimationResponseDTO> getByAnalysisId(@PathVariable UUID analysisId);
+
     @GetMapping("/{id}/export/excel")
     ResponseEntity<byte[]> exportExcel(@PathVariable UUID id);
 }

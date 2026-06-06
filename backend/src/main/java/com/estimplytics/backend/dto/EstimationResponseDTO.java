@@ -39,4 +39,6 @@ public class EstimationResponseDTO {
     private LocalDateTime createdAt;
     @Schema(description = "Update date", example = "2026-05-08T09:00:00")
     private LocalDateTime updatedAt;
+    @Schema(description = "Number of similar historical requests used for the suggestion", example = "42")
+    private Integer similarRequestsCount;
 }

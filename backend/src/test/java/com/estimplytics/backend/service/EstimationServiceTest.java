@@ -173,4 +173,17 @@ class EstimationServiceTest {
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(EstimationNotFoundException.class);
     }
+
+    @Test
+    void findByAnalysisId_shouldMapWhenEntityExists() {
+        UUID analysisId = UUID.randomUUID();
+        Estimation entity = mock(Estimation.class);
+        EstimationResponseDTO response = mock(EstimationResponseDTO.class);
+        when(repository.findByAnalysis_Id(analysisId)).thenReturn(Optional.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(response);
+
+        Optional<EstimationResponseDTO> result = service.findByAnalysisId(analysisId);
+
+        assertThat(result).contains(response);
+    }
 }

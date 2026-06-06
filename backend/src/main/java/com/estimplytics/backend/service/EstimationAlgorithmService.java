@@ -99,6 +99,7 @@ public class EstimationAlgorithmService {
             .suggestedHoursTesting(suggestedTesting)
             .suggestedTotalHours(suggestedTotalHours)
             .fiabilityPercentage(calculateFiability(historicalTotalHours))
+            .similarRequestsCount(historicalEstimations.size())
             .build();
     }
 
@@ -110,6 +111,7 @@ public class EstimationAlgorithmService {
             .suggestedHoursTesting(0)
             .suggestedTotalHours(0)
             .fiabilityPercentage(0)
+            .similarRequestsCount(0)
             .build();
     }
 

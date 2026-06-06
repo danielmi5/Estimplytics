@@ -62,7 +62,9 @@ public class EstimationService implements IEstimationService {
         dto.setFiability(estimationAlgorithmResult.getFiabilityPercentage());
         Estimation entity = mapper.toEntity(dto);
         requireEditAndRenew(entity);
-        return mapper.toResponseDTO(repository.save(entity));
+        EstimationResponseDTO response = mapper.toResponseDTO(repository.save(entity));
+        response.setSimilarRequestsCount(resolveSimilarRequestsCount(dto.getAnalysisId()));
+        return response;
     }
 
     @Override
@@ -71,7 +73,10 @@ public class EstimationService implements IEstimationService {
         return repository.findById(id).map(entity -> {
             requireEditAndRenew(entity);
             mapper.updateEntityFromDTO(dto, entity);
-            return mapper.toResponseDTO(repository.save(entity));
+            EstimationResponseDTO response = mapper.toResponseDTO(repository.save(entity));
+            UUID analysisId = entity.getAnalysis() != null ? entity.getAnalysis().getId() : null;
+            response.setSimilarRequestsCount(resolveSimilarRequestsCount(analysisId));
+            return response;
         }).orElseThrow(() -> new EstimationNotFoundException("Estimation not found with id %s".formatted(id)));
     }
 
@@ -84,10 +89,25 @@ public class EstimationService implements IEstimationService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<EstimationResponseDTO> findByAnalysisId(UUID analysisId) {
+        return repository.findByAnalysis_Id(analysisId).map(entity -> {
+            EstimationResponseDTO response = mapper.toResponseDTO(entity);
+            response.setSimilarRequestsCount(resolveSimilarRequestsCount(analysisId));
+            return response;
+        });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<ExcelExport> exportExcel(UUID id) {
         return repository.findById(id).map(estimation -> {
             String code = originRequestCode(estimation);
-            byte[] content = excelGeneratorService.exportEstimation(estimation, code);
+            UUID analysisId = estimation.getAnalysis() != null ? estimation.getAnalysis().getId() : null;
+            byte[] content = excelGeneratorService.exportEstimation(
+                estimation,
+                code,
+                resolveSimilarRequestsCount(analysisId)
+            );
             return new ExcelExport(content, "Estimation-%s.xlsx".formatted(code));
         });
     }
@@ -114,5 +134,18 @@ public class EstimationService implements IEstimationService {
         if (estimation.getAnalysis() == null || estimation.getAnalysis().getRequest() == null) return "";
         UUID requestId = estimation.getAnalysis().getRequest().getId();
         return requestRepository.findById(requestId).map(Request::getOriginRequestCode).orElse("");
+    }
+
+    private Integer resolveSimilarRequestsCount(UUID analysisId) {
+        if (analysisId == null) {
+            return 0;
+        }
+
+        EstimationAlgorithmResultDTO algorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(analysisId);
+        if (algorithmResult == null || algorithmResult.getSimilarRequestsCount() == null) {
+            return 0;
+        }
+
+        return algorithmResult.getSimilarRequestsCount();
     }
 }

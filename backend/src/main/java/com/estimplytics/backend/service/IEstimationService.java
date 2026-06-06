@@ -12,4 +12,6 @@ public interface IEstimationService extends ICrudService<EstimationRequestDTO, E
     record ExcelExport(byte[] content, String filename) {}
 
     Optional<ExcelExport> exportExcel(UUID id);
+
+    Optional<EstimationResponseDTO> findByAnalysisId(UUID analysisId);
 }

@@ -54,6 +54,13 @@ public class EstimationController implements IEstimationController {
     }
 
     @Override
+    public ResponseEntity<EstimationResponseDTO> getByAnalysisId(UUID analysisId) {
+        return service.findByAnalysisId(analysisId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
     public ResponseEntity<byte[]> exportExcel(UUID id) {
         return service.exportExcel(id)
             .map(export -> {

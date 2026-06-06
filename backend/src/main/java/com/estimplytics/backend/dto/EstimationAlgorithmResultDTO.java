@@ -23,4 +23,6 @@ public class EstimationAlgorithmResultDTO {
     private Integer suggestedTotalHours;
     @Schema(description = "Suggested confidence percentage", example = "85")
     private Integer fiabilityPercentage;
+    @Schema(description = "Number of similar historical requests used for the suggestion", example = "42")
+    private Integer similarRequestsCount;
 }

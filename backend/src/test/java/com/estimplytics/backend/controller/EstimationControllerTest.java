@@ -95,6 +95,28 @@ class EstimationControllerTest {
     }
 
     @Test
+    void getByAnalysisId_shouldReturnOkWhenExists() {
+        UUID analysisId = UUID.randomUUID();
+        EstimationResponseDTO dto = mock(EstimationResponseDTO.class);
+        when(service.findByAnalysisId(analysisId)).thenReturn(Optional.of(dto));
+
+        ResponseEntity<EstimationResponseDTO> response = controller.getByAnalysisId(analysisId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isSameAs(dto);
+    }
+
+    @Test
+    void getByAnalysisId_shouldReturnNotFoundWhenMissing() {
+        UUID analysisId = UUID.randomUUID();
+        when(service.findByAnalysisId(analysisId)).thenReturn(Optional.empty());
+
+        ResponseEntity<EstimationResponseDTO> response = controller.getByAnalysisId(analysisId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void delete_shouldReturnNoContent() {
         UUID id = UUID.randomUUID();
 
