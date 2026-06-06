@@ -32,11 +32,3 @@ export interface StatMetric {
   maxValue: number;
   color: string;
 }
-
-export interface SummaryMetric {
-  id: string;
-  value: string;
-  label: string;
-  tone: 'success' | 'info' | 'warning';
-  icon: string;
-}

@@ -11,8 +11,8 @@ describe('HomePage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-        imports: [HomePage],
-        providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()]
+      imports: [HomePage],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomePage);
