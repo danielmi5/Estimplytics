@@ -42,3 +42,9 @@ h5 {
 h6 {
   font-size: var(--font-size-lg);
 }
+
+input,
+textarea,
+select {
+  color: var(--text);
+}

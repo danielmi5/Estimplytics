@@ -48,7 +48,7 @@
 
     background: var(--button-primary-default);
 
-    @include mixins.typography(mini, var(--text-dark));
+    @include mixins.typography(mini, vars.$text-dark);
 
     font-weight: var(--font-weight-600);
   }

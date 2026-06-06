@@ -13,14 +13,24 @@
   --color-category-4: #{$color-category-dark-4};
   --color-category-5: #{$color-category-dark-5};
 
-  --color-success: #{$color-success};
-  --color-success-dark: #{$color-success-dark};
-  --color-error: #{$color-error};
-  --color-error-dark: #{$color-error-dark};
-  --color-warning: #{$color-warning};
-  --color-warning-dark: #{$color-warning-dark};
-  --color-info: #{$color-info};
-  --color-info-dark: #{$color-info-dark};
+  --color-primary-base: #{$color-primary-base};
+  --color-primary-lightest: #{$color-primary-lightest};
+  --color-primary-lighter: #{$color-primary-lighter};
+  --color-neutral-1: #{$color-neutral-1};
+  --color-neutral-2: #{$color-neutral-2};
+  --color-neutral-3: #{$color-neutral-3};
+  --color-neutral-4: #{$color-neutral-4};
+  --color-neutral-5: #{$color-neutral-5};
+  --surface-on-accent: #{$bg-light};
+
+  --color-success: #{$color-success-dark};
+  --color-success-dark: #{$color-success};
+  --color-error: #{$color-error-dark};
+  --color-error-dark: #{$color-error};
+  --color-warning: #{$color-warning-dark};
+  --color-warning-dark: #{$color-warning};
+  --color-info: #{$color-info-dark};
+  --color-info-dark: #{$color-info};
 
   --button-primary-default: #{$button-primary-default};
   --button-primary-hover: #{$button-primary-hover};
@@ -63,6 +73,9 @@
   --bg-error: #{$bg-error};
   --bg-warning: #{$bg-warning};
   --bg-info: #{$bg-info};
+
+  --bg-header-hover: #{$bg-header-hover-light};
+  --bg-subtle-hover: #{$bg-subtle-hover-light};
 
   --font-primary: #{$font-primary};
   --font-secondary: #{$font-secondary};
@@ -125,10 +138,24 @@
 
 .dark,
 html.dark {
-  --color-success: #{$color-success-dark};
-  --color-error: #{$color-error-dark};
-  --color-warning: #{$color-warning-dark};
-  --color-info: #{$color-info-dark};
+  --color-primary-base: #{$color-primary-light};
+  --color-primary-lightest: #{$color-primary-darkest};
+  --color-primary-lighter: #{$color-primary-darker};
+  --color-neutral-1: #{$color-neutral-6};
+  --color-neutral-2: #{$color-neutral-5};
+  --color-neutral-3: #{$color-neutral-4};
+  --color-neutral-4: #{$color-neutral-3};
+  --color-neutral-5: #{$color-neutral-2};
+  --surface-on-accent: #{$text-dark};
+
+  --color-success: #{$color-success};
+  --color-success-dark: #{$color-success-dark};
+  --color-error: #{$color-error};
+  --color-error-dark: #{$color-error-dark};
+  --color-warning: #{$color-warning};
+  --color-warning-dark: #{$color-warning-dark};
+  --color-info: #{$color-info};
+  --color-info-dark: #{$color-info-dark};
 
   --color-secondary-1: #{$color-secondary-1};
   --color-secondary-2: #{$color-secondary-2};
@@ -141,14 +168,6 @@ html.dark {
   --color-category-3: #{$color-category-3};
   --color-category-4: #{$color-category-4};
   --color-category-5: #{$color-category-5};
-
-  --button-primary-default: #{$button-primary-default};
-  --button-primary-hover: #{$button-primary-hover};
-  --button-primary-clicked: #{$button-primary-clicked};
-
-  --button-secondary-default: #{$button-secondary-default};
-  --button-secondary-hover: #{$button-secondary-hover};
-  --button-secondary-clicked: #{$button-secondary-clicked};
 
   --text: #{$text-dark};
   --text-dark: #{$text-light};
@@ -164,19 +183,19 @@ html.dark {
   --bg: #{$bg-dark};
 
   --bg-header: #{$bg-header-dark};
-  --bg-footer: #{$bg-footer-dark};
-
-  --link-footer: #{$link-footer-dark};
   --bg-cards: #{$bg-cards-dark};
   --bg-modals: #{$bg-modals-dark};
 
   --card-important: #{$card-important-dark};
   --card-label: #{$card-label-dark};
 
-  --bg-success: #{$bg-success};
-  --bg-error: #{$bg-error};
-  --bg-warning: #{$bg-warning};
-  --bg-info: #{$bg-info};
+  --bg-success: #{$bg-success-dark-theme};
+  --bg-error: #{$bg-error-dark-theme};
+  --bg-warning: #{$bg-warning-dark-theme};
+  --bg-info: #{$bg-info-dark-theme};
+
+  --bg-header-hover: #{$bg-header-hover-dark};
+  --bg-subtle-hover: #{$bg-subtle-hover-dark};
 }
 
 

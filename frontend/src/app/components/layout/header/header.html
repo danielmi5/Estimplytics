@@ -17,6 +17,17 @@
     </nav>
 
     <div class="header__actions">
+      <button
+        class="header__theme-toggle"
+        [class.header__theme-toggle--dark]="theme.isDark()"
+        type="button"
+        [attr.aria-label]="theme.isDark() ? 'Activar modo claro' : 'Activar modo oscuro'"
+        [attr.aria-pressed]="theme.isDark()"
+        (click)="toggleTheme()"
+      >
+        <span class="header__theme-toggle-circle" aria-hidden="true"></span>
+      </button>
+
       <a class="header__avatar" [routerLink]="'/configuration'" [attr.aria-label]="avatarLabel()" aria-haspopup="menu" aria-expanded="false" (click)="closeMobileMenu()">{{ avatarInitials() }}</a>
 
       <button class="header__menu" type="button" [attr.aria-expanded]="mobileMenuAriaExpanded()" [attr.aria-label]="mobileMenuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'" (click)="toggleMobileMenu()">

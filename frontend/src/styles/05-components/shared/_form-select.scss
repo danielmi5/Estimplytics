@@ -25,11 +25,11 @@
     width: 100%;
     min-width: 0;
     @include mixins.flex(row, $spacing-sm, flex-start, center);
-    border-bottom: $border-medium solid $color-neutral-3;
+    border-bottom: $border-medium solid var(--card-label);
     transition: border-color $transition-fast ease-in-out, background $transition-fast ease-in-out;
 
     &:hover {
-      background: $color-neutral-1;
+      background: var(--bg-subtle-hover);
     }
 
     &:focus-within {

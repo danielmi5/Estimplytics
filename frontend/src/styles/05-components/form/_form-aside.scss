@@ -10,7 +10,7 @@
 	padding: $spacing-3xl;
 
 	background: linear-gradient(135deg, var(--card-important) 0%, var(--text-important) 100%);
-	color: var(--text-dark);
+	color: $text-dark;
 
 	@media (max-width: $breakpoint-lg) {
 		min-height: 0;

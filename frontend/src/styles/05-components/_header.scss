@@ -40,7 +40,7 @@
     }
 
     &-content {
-      @include mixins.typography(h5, var(--card-important));
+      @include mixins.typography(h5, var(--text-important));
     }
   }
 
@@ -63,8 +63,7 @@
     transition: color var(--transition-fast) ease, background-color var(--transition-fast) ease;
 
     &:hover {
-      color: var(--text-important);
-      background-color: var(--bg-info);
+      background-color: var(--bg-header-hover);
     }
 
     &:focus-visible {
@@ -83,6 +82,48 @@
     z-index: 1;
   }
 
+  &__theme-toggle {
+    position: relative;
+    width: 2.75rem;
+    height: 1.5rem;
+    padding: 0.125rem;
+    border: var(--border-thin) solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg);
+    cursor: pointer;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    transition: border-color var(--transition-base) ease, box-shadow var(--transition-base) ease;
+
+    &:hover {
+      border-color: var(--color-primary-base);
+      box-shadow: var(--shadow-sm);
+    }
+
+    &:focus-visible {
+      outline: var(--border-medium) solid var(--text-important);
+      outline-offset: var(--spacing-xs);
+    }
+
+    &-circle {
+      position: absolute;
+      top: 0.125rem;
+      left: 0.125rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: var(--radius-full);
+      background: var(--color-primary-base);
+      box-shadow: var(--shadow-sm);
+      transform: translateX(0);
+      transition: transform var(--transition-base) ease;
+      pointer-events: none;
+    }
+
+    &--dark &-circle {
+      transform: translateX(1.25rem);
+    }
+  }
+
   &__avatar {
     width: 2.25rem;
     height: 2.25rem;
@@ -94,7 +135,7 @@
     border: none;
     text-decoration: none;
 
-    @include mixins.typography(h6, var(--text-dark));
+    @include mixins.typography(h6, $text-dark);
 
     cursor: pointer;
     transition: transform var(--transition-fast) ease;
@@ -113,13 +154,19 @@
     position: relative;
 
     background: none;
+    color: var(--text-important);
 
     border: none;
     cursor: pointer;
     transition: background-color var(--transition-fast) ease;
 
+    .feather-icon,
+    .feather-icon svg {
+      stroke: currentColor;
+    }
+
     &:hover {
-      background-color: transparent;
+      background-color: var(--bg-header-hover);
     }
 
     &:focus-visible {

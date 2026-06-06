@@ -12,7 +12,7 @@
 
   background: none;
 
-  @include mixins.typography(small, var(--text-light));
+  @include mixins.typography(small, var(--text));
   font-weight: var(--font-weight-500);
   text-align: left;
   text-decoration: none;
@@ -55,8 +55,8 @@
   }
 
   &--active {
-    border-left-color: var(--card-important);
-    background-color: var(--bg-info);
+    border-left-color: var(--text-important);
+    background-color: var(--bg-subtle-hover);
     color: var(--text-important);
     font-weight: var(--font-weight-600);
   }

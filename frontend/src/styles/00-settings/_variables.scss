@@ -110,9 +110,20 @@ $card-label-light: $color-neutral-4;
 $card-label-dark: $color-neutral-2;
 
 $bg-success: hsl(38 29.3% 83.9%);
-$bg-error:hsl(5 29.3% 83.9%);
+$bg-error: hsl(5 29.3% 83.9%);
 $bg-warning: hsl(38 29.3% 83.9%);
 $bg-info: hsl(195 29.3% 83.9%);
+
+$bg-success-dark-theme: hsl(132 28% 20%);
+$bg-error-dark-theme: hsl(5 28% 20%);
+$bg-warning-dark-theme: hsl(38 28% 20%);
+$bg-info-dark-theme: hsl(195 28% 20%);
+
+$bg-header-hover-light: $color-primary-lighter;
+$bg-header-hover-dark: $color-primary-darker;
+
+$bg-subtle-hover-light: $color-neutral-1;
+$bg-subtle-hover-dark: hsl(210 8% 20%);
 
 // Button variants
 $button-primary-default: $color-primary-base;

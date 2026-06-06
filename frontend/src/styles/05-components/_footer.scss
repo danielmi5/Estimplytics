@@ -6,8 +6,8 @@
 .footer {
 	padding: var(--spacing-2xl) var(--spacing-3xl);
 
-	background-color: var(--bg-footer);
-	color: var(--link-footer);
+	background-color: $bg-footer-light;
+	color: $link-footer-light;
 
 	&__top {
 		max-width: var(--container-max-width, 80rem);
@@ -18,7 +18,7 @@
 		grid-template-columns: 2fr 1fr 1fr 1fr;
 		gap: var(--spacing-2xl);
 
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid $color-neutral-5;
 	}
 
 	&__brand {
