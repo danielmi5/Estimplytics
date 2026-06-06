@@ -13,6 +13,9 @@ import java.util.UUID;
 @RequestMapping("/api/impact-analyses")
 public interface IImpactAnalysisController extends ICrudController<ImpactAnalysisRequestDTO, ImpactAnalysisResponseDTO, ImpactAnalysisUpdateDTO, UUID> {
 
+    @GetMapping("/request/{requestId}")
+    ResponseEntity<ImpactAnalysisResponseDTO> getByRequestId(@PathVariable UUID requestId);
+
     @GetMapping("/{id}/export/docx")
     ResponseEntity<byte[]> exportDocx(@PathVariable UUID id);
 }

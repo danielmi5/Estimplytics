@@ -153,4 +153,17 @@ class ImpactAnalysisServiceTest {
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(ImpactAnalysisNotFoundException.class);
     }
+
+    @Test
+    void findByRequestId_shouldMapWhenEntityExists() {
+        UUID requestId = UUID.randomUUID();
+        ImpactAnalysis entity = mock(ImpactAnalysis.class);
+        ImpactAnalysisResponseDTO response = mock(ImpactAnalysisResponseDTO.class);
+        when(repository.findByRequest_Id(requestId)).thenReturn(Optional.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(response);
+
+        Optional<ImpactAnalysisResponseDTO> result = service.findByRequestId(requestId);
+
+        assertThat(result).contains(response);
+    }
 }

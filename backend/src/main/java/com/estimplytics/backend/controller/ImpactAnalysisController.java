@@ -54,6 +54,13 @@ public class ImpactAnalysisController implements IImpactAnalysisController {
     }
 
     @Override
+    public ResponseEntity<ImpactAnalysisResponseDTO> getByRequestId(UUID requestId) {
+        return service.findByRequestId(requestId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
     public ResponseEntity<byte[]> exportDocx(UUID id) {
         return service.exportDocx(id)
             .map(export -> {

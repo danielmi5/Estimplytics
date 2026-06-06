@@ -12,4 +12,6 @@ public interface IImpactAnalysisService extends ICrudService<ImpactAnalysisReque
     record DocxExport(byte[] content, String filename) {}
 
     Optional<DocxExport> exportDocx(UUID id);
+
+    Optional<ImpactAnalysisResponseDTO> findByRequestId(UUID requestId);
 }

@@ -79,6 +79,12 @@ public class ImpactAnalysisService implements IImpactAnalysisService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ImpactAnalysisResponseDTO> findByRequestId(UUID requestId) {
+        return repository.findByRequest_Id(requestId).map(mapper::toResponseDTO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<DocxExport> exportDocx(UUID id) {
         return repository.findById(id).map(analysis -> {
             String code = originRequestCode(analysis);
