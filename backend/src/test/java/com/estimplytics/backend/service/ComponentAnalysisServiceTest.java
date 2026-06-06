@@ -124,4 +124,17 @@ class ComponentAnalysisServiceTest {
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(ComponentAnalysisNotFoundException.class);
     }
+
+    @Test
+    void findByAnalysisId_shouldMapEntities() {
+        UUID analysisId = UUID.randomUUID();
+        ComponentAnalysis entity = mock(ComponentAnalysis.class);
+        ComponentAnalysisResponseDTO response = mock(ComponentAnalysisResponseDTO.class);
+        when(repository.findByAnalysis_Id(analysisId)).thenReturn(List.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(response);
+
+        List<ComponentAnalysisResponseDTO> result = service.findByAnalysisId(analysisId);
+
+        assertThat(result).containsExactly(response);
+    }
 }

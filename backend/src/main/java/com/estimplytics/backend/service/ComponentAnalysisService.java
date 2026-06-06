@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,6 +52,12 @@ public class ComponentAnalysisService implements IComponentAnalysisService {
             mapper.updateEntityFromDTO(dto, entity);
             return mapper.toResponseDTO(repository.save(entity));
         }).orElseThrow(() -> new ComponentAnalysisNotFoundException("ComponentAnalysis not found with id %s".formatted(id)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ComponentAnalysisResponseDTO> findByAnalysisId(UUID analysisId) {
+        return repository.findByAnalysis_Id(analysisId).stream().map(mapper::toResponseDTO).toList();
     }
 
     @Override
