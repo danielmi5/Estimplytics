@@ -20,6 +20,7 @@ public class ExcelGeneratorService {
     private static final String[] HEADERS = {
         "Código petición origen",
         "Número de versión",
+        "Número peticiones basadas",
         "Porcentaje de fiabilidad",
         "Horas estimadas de planificación",
         "Horas estimadas de análisis",
@@ -30,7 +31,7 @@ public class ExcelGeneratorService {
         "Justificación del feedback"
     };
 
-    public byte[] exportEstimation(Estimation estimation, String requestCode) {
+    public byte[] exportEstimation(Estimation estimation, String requestCode, Integer similarRequestsCount) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Estimation");
             CellStyle headerStyle = workbook.createCellStyle();
@@ -48,20 +49,36 @@ public class ExcelGeneratorService {
             Row dataRow = sheet.createRow(1);
             setCellValue(dataRow, 0, requestCode);
             setCellValue(dataRow, 1, estimation.getVersionNumber());
-            setCellValue(dataRow, 2, estimation.getFiability());
-            setCellValue(dataRow, 3, estimation.getHoursPlanning());
-            setCellValue(dataRow, 4, estimation.getHoursAnalysis());
-            setCellValue(dataRow, 5, estimation.getHoursDevelopment());
-            setCellValue(dataRow, 6, estimation.getHoursTesting());
-            setCellValue(dataRow, 7, estimation.getTotalHours());
-            setCellValue(dataRow, 8, estimation.getActualHoursFeedback());
-            setCellValue(dataRow, 9, estimation.getJustification());
+            setCellValue(dataRow, 2, similarRequestsCount);
+            setCellValue(dataRow, 3, estimation.getFiability());
+            setCellValue(dataRow, 4, estimation.getHoursPlanning());
+            setCellValue(dataRow, 5, estimation.getHoursAnalysis());
+            setCellValue(dataRow, 6, estimation.getHoursDevelopment());
+            setCellValue(dataRow, 7, estimation.getHoursTesting());
+            setCellValue(dataRow, 8, estimation.getTotalHours());
+            setCellValue(dataRow, 9, estimation.getActualHoursFeedback());
+            setCellValue(dataRow, 10, resolveJustification(estimation));
 
             workbook.write(outputStream);
             return outputStream.toByteArray();
         } catch (IOException exception) {
             throw new ReportGenerationException("Error while generating Excel", exception);
         }
+    }
+
+    private String resolveJustification(Estimation estimation) {
+        String justification = estimation.getJustification();
+        if (justification != null && !justification.isBlank()) {
+            return justification.trim();
+        }
+
+        Integer totalHours = estimation.getTotalHours();
+        Integer feedbackHours = estimation.getActualHoursFeedback();
+        if (totalHours != null && feedbackHours != null && !totalHours.equals(feedbackHours)) {
+            return "Horas ajustadas por necesidad";
+        }
+
+        return "";
     }
 
     private void setCellValue(Row row, int columnIndex, Object value) {
