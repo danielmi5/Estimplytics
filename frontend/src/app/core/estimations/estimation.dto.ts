@@ -26,6 +26,7 @@ export interface EstimationResponse {
   justification?: string;
   createdAt?: string;
   updatedAt: string;
+  similarRequestsCount?: number;
 }
 
 export interface EstimationUpdate {
