@@ -1,0 +1,76 @@
+<article
+  class="step-card"
+  [class.step-card--completed]="state() === 'completed'"
+  [class.step-card--active]="state() === 'active'"
+  [class.step-card--inactive]="state() === 'inactive'"
+>
+  <header class="step-card__header">
+    <span
+      class="step-card__badge"
+      [class.step-card__badge--success]="state() === 'completed'"
+      [class.step-card__badge--active]="state() === 'active'"
+      [class.step-card__badge--inactive]="state() === 'inactive'"
+      aria-hidden="true"
+    >4</span>
+    <h2 class="step-card__title">Paso 4: Entregables</h2>
+    @if (state() === 'active' || state() === 'completed') {
+      <span class="step-files__version-badge">
+        Versión {{ versionDisplay() }} guardada
+      </span>
+    }
+  </header>
+
+  @if (state() === 'active' || state() === 'completed') {
+    <div class="step-card__body step-files">
+      <div class="step-files__downloads">
+        <button
+          type="button"
+          class="step-files__download-button"
+          [disabled]="!canDownload() || isDownloadingAnalysis()"
+          (click)="onDownloadAnalysis()"
+        >
+          <span class="step-files__download-icon step-files__download-icon--analysis" aria-hidden="true">
+            <span [feather]="'file-text'" variant="botones"></span>
+          </span>
+          <div class="step-files__download-content">
+            <h3 class="step-files__download-title">Descargar análisis</h3>
+            <p class="step-files__download-description">Informe de análisis de impacto (.docx)</p>
+          </div>
+          <span class="step-files__download-action" aria-hidden="true">
+            <span [feather]="'download'" variant="botones"></span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="step-files__download-button"
+          [disabled]="!canDownload() || isDownloadingPlanning()"
+          (click)="onDownloadPlanning()"
+        >
+          <span class="step-files__download-icon step-files__download-icon--planning" aria-hidden="true">
+            <span [feather]="'file'" variant="botones"></span>
+          </span>
+          <div class="step-files__download-content">
+            <h3 class="step-files__download-title">Descargar estimación</h3>
+            <p class="step-files__download-description">Tabla de estimación (.xlsx)</p>
+          </div>
+          <span class="step-files__download-action" aria-hidden="true">
+            <span [feather]="'download'" variant="botones"></span>
+          </span>
+        </button>
+      </div>
+
+      @if (state() === 'active' && analysisDownloaded() && planningDownloaded()) {
+        <div class="step-card__actions">
+          <app-button variant="primary" label="Finalizar" buttonType="button" (pressed)="onComplete()" />
+        </div>
+      }
+
+      @if (state() === 'completed') {
+        <div class="step-card__actions">
+          <app-button variant="secondary" label="Editar" buttonType="button" (pressed)="onEdit()" />
+        </div>
+      }
+    </div>
+  }
+</article>
