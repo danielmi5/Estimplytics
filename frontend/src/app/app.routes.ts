@@ -32,6 +32,12 @@ export const routes: Routes = [
 		title: 'Peticiones'
 	},
 	{
+		path: 'analysis',
+		loadComponent: () => import('./pages/analysis/analysis').then((m) => m.AnalysisPage),
+		canActivate: [authGuard],
+		title: 'Análisis'
+	},
+	{
 		path: 'home',
 		redirectTo: '',
 		pathMatch: 'full'
