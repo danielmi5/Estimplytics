@@ -46,8 +46,9 @@
                 variant="secondary"
                 size="sm"
                 label="Iniciar análisis"
-                [routerLink]="['/analisis-impacto', request.id]">
-              </app-button>
+                [routerLink]="['/analysis']"
+                [queryParams]="{ requestId: request.id }"
+              />
             </td>
           </tr>
         }

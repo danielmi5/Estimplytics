@@ -40,4 +40,10 @@
   &__search {
     max-width: 28rem;
   }
+
+  &__actions {
+    @include mixins.flex(row, var(--spacing-md), flex-end, center);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-xl);
+  }
 }
