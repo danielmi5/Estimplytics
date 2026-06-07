@@ -1,0 +1,64 @@
+<section class="user-profile-form" aria-labelledby="profile-title">
+  <header class="user-profile-form__header">
+    <h2 class="user-profile-form__title" id="profile-title">Perfil de usuario</h2>
+  </header>
+
+  <form
+    class="user-profile-form__form"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    aria-label="Formulario de perfil de usuario"
+    novalidate
+  >
+    <app-form-input
+      id="profile-name"
+      name="profile-name"
+      label="Nombre"
+      type="text"
+      formControlName="name"
+      [validationState]="fieldState('name')"
+      [errorMessage]="fieldMessage('name', 'error')"
+      [successMessage]="fieldMessage('name', 'success')"
+      [showSuccessMessage]="true"
+      helpText="Deja vacío para no modificar."
+    />
+
+    <app-form-input
+      id="profile-email"
+      name="profile-email"
+      label="Correo"
+      type="email"
+      formControlName="email"
+      [validationState]="fieldState('email')"
+      [errorMessage]="fieldMessage('email', 'error')"
+      [successMessage]="fieldMessage('email', 'success')"
+      [showSuccessMessage]="true"
+      helpText="Deja vacío para no modificar."
+    />
+
+    <app-form-input
+      id="profile-password"
+      name="profile-password"
+      label="Contraseña"
+      type="password"
+      placeholder="Nueva contraseña (mínimo 8 caracteres)"
+      formControlName="password"
+      [validationState]="fieldState('password')"
+      [errorMessage]="fieldMessage('password', 'error')"
+      [successMessage]="fieldMessage('password', 'success')"
+      [showSuccessMessage]="true"
+      helpText="Deja vacío para mantener la contraseña actual."
+    />
+
+    <app-button
+      variant="primary"
+      label="Guardar perfil"
+      buttonType="submit"
+      size="md"
+      [fullWidth]="true"
+      [disabled]="profileService.isLoading()"
+      icon="save"
+      ariaLabel="Guardar cambios del perfil de usuario"
+    />
+  </form>
+</section>

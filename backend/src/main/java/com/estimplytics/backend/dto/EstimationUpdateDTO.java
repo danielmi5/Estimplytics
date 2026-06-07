@@ -20,12 +20,14 @@ public class EstimationUpdateDTO {
 
     @Schema(description = "Confidence percentage", example = "90")
     private Integer fiability;
+    @Schema(description = "Estimated hours for planning", example = "4")
+    private Integer hoursPlanning;
     @Schema(description = "Estimated hours for analysis", example = "8")
-    private Integer hoursAn;
+    private Integer hoursAnalysis;
     @Schema(description = "Estimated hours for development", example = "18")
-    private Integer hoursAs;
-    @Schema(description = "Estimated hours for deployment", example = "4")
-    private Integer hoursDe;
+    private Integer hoursDevelopment;
+    @Schema(description = "Estimated hours for testing", example = "6")
+    private Integer hoursTesting;
     @Schema(description = "Total hours", example = "30")
     private Integer totalHours;
     @Schema(description = "Actual hours feedback", example = "29")

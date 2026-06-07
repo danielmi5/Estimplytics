@@ -5,9 +5,12 @@ import com.estimplytics.backend.dto.EstimationResponseDTO;
 import com.estimplytics.backend.dto.EstimationUpdateDTO;
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
 import com.estimplytics.backend.entity.Estimation;
+import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.EstimationNotFoundException;
 import com.estimplytics.backend.mapper.EstimationMapper;
 import com.estimplytics.backend.repository.EstimationRepository;
+import com.estimplytics.backend.repository.ImpactAnalysisRepository;
+import com.estimplytics.backend.repository.RequestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,15 +25,19 @@ public class EstimationService implements IEstimationService {
     private final EstimationRepository repository;
     private final EstimationMapper mapper;
     private final EstimationAlgorithmService estimationAlgorithmService;
+    private final ExcelGeneratorService excelGeneratorService;
+    private final ImpactAnalysisRepository impactAnalysisRepository;
+    private final RequestRepository requestRepository;
+    private final OwnershipService ownershipService;
 
-    public EstimationService(
-        EstimationRepository repository,
-        EstimationMapper mapper,
-        EstimationAlgorithmService estimationAlgorithmService
-    ) {
+    public EstimationService(EstimationRepository repository, EstimationMapper mapper, EstimationAlgorithmService estimationAlgorithmService, ExcelGeneratorService excelGeneratorService, ImpactAnalysisRepository impactAnalysisRepository, RequestRepository requestRepository, OwnershipService ownershipService) {
         this.repository = repository;
         this.mapper = mapper;
         this.estimationAlgorithmService = estimationAlgorithmService;
+        this.excelGeneratorService = excelGeneratorService;
+        this.impactAnalysisRepository = impactAnalysisRepository;
+        this.requestRepository = requestRepository;
+        this.ownershipService = ownershipService;
     }
 
     @Override
@@ -47,28 +54,98 @@ public class EstimationService implements IEstimationService {
     @Transactional
     public EstimationResponseDTO create(EstimationRequestDTO dto) {
         EstimationAlgorithmResultDTO estimationAlgorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(dto.getAnalysisId());
+        dto.setHoursPlanning(estimationAlgorithmResult.getSuggestedHoursPlanning());
+        dto.setHoursAnalysis(estimationAlgorithmResult.getSuggestedHoursAnalysis());
+        dto.setHoursDevelopment(estimationAlgorithmResult.getSuggestedHoursDevelopment());
+        dto.setHoursTesting(estimationAlgorithmResult.getSuggestedHoursTesting());
         dto.setTotalHours(estimationAlgorithmResult.getSuggestedTotalHours());
         dto.setFiability(estimationAlgorithmResult.getFiabilityPercentage());
         Estimation entity = mapper.toEntity(dto);
-        Estimation savedEntity = repository.save(entity);
-        return mapper.toResponseDTO(savedEntity);
+        requireEditAndRenew(entity);
+        EstimationResponseDTO response = mapper.toResponseDTO(repository.save(entity));
+        response.setSimilarRequestsCount(resolveSimilarRequestsCount(dto.getAnalysisId()));
+        return response;
     }
 
     @Override
     @Transactional
     public EstimationResponseDTO update(UUID id, EstimationUpdateDTO dto) {
         return repository.findById(id).map(entity -> {
+            requireEditAndRenew(entity);
             mapper.updateEntityFromDTO(dto, entity);
-            return mapper.toResponseDTO(repository.save(entity));
+            EstimationResponseDTO response = mapper.toResponseDTO(repository.save(entity));
+            UUID analysisId = entity.getAnalysis() != null ? entity.getAnalysis().getId() : null;
+            response.setSimilarRequestsCount(resolveSimilarRequestsCount(analysisId));
+            return response;
         }).orElseThrow(() -> new EstimationNotFoundException("Estimation not found with id %s".formatted(id)));
     }
 
     @Override
     @Transactional
     public void delete(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new EstimationNotFoundException("Estimation not found with id %s".formatted(id));
-        }
+        if (!repository.existsById(id)) throw new EstimationNotFoundException("Estimation not found with id %s".formatted(id));
         repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<EstimationResponseDTO> findByAnalysisId(UUID analysisId) {
+        return repository.findByAnalysis_Id(analysisId).map(entity -> {
+            EstimationResponseDTO response = mapper.toResponseDTO(entity);
+            response.setSimilarRequestsCount(resolveSimilarRequestsCount(analysisId));
+            return response;
+        });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ExcelExport> exportExcel(UUID id) {
+        return repository.findById(id).map(estimation -> {
+            String code = originRequestCode(estimation);
+            UUID analysisId = estimation.getAnalysis() != null ? estimation.getAnalysis().getId() : null;
+            byte[] content = excelGeneratorService.exportEstimation(
+                estimation,
+                code,
+                resolveSimilarRequestsCount(analysisId)
+            );
+            return new ExcelExport(content, "Estimation-%s.xlsx".formatted(code));
+        });
+    }
+
+    private void requireEditAndRenew(Estimation estimation) {
+        Request request = parentRequest(estimation);
+        ownershipService.requireEditAndRenew(request);
+        requestRepository.save(request);
+    }
+
+    private Request parentRequest(Estimation estimation) {
+        if (estimation.getAnalysis() == null || estimation.getAnalysis().getId() == null) {
+            throw new IllegalStateException("Estimation must be linked to an impact analysis");
+        }
+        return impactAnalysisRepository.findById(estimation.getAnalysis().getId()).map(analysis -> {
+            if (analysis.getRequest() == null || analysis.getRequest().getId() == null) {
+                throw new IllegalStateException("Impact analysis must be linked to a request");
+            }
+            return requestRepository.findById(analysis.getRequest().getId()).orElseThrow(() -> new IllegalStateException("Parent request not found"));
+        }).orElseThrow(() -> new IllegalStateException("Impact analysis not found"));
+    }
+
+    private String originRequestCode(Estimation estimation) {
+        if (estimation.getAnalysis() == null || estimation.getAnalysis().getRequest() == null) return "";
+        UUID requestId = estimation.getAnalysis().getRequest().getId();
+        return requestRepository.findById(requestId).map(Request::getOriginRequestCode).orElse("");
+    }
+
+    private Integer resolveSimilarRequestsCount(UUID analysisId) {
+        if (analysisId == null) {
+            return 0;
+        }
+
+        EstimationAlgorithmResultDTO algorithmResult = estimationAlgorithmService.calculateSuggestionForAnalysisId(analysisId);
+        if (algorithmResult == null || algorithmResult.getSimilarRequestsCount() == null) {
+            return 0;
+        }
+
+        return algorithmResult.getSimilarRequestsCount();
     }
 }

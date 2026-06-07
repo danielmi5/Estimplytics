@@ -31,7 +31,7 @@
 
     @include mixins.flex(row, $spacing-sm, flex-start, center);
     box-sizing: border-box;
-    border-bottom: $border-medium solid $color-neutral-3;
+    border-bottom: $border-medium solid var(--card-label);
     border-radius: 0;
 
     background: transparent;
@@ -40,7 +40,7 @@
 
     &:hover {
       cursor: text;
-      background: $color-neutral-1;
+      background: var(--bg-subtle-hover);
     }
 
     &:focus-within {
@@ -104,13 +104,7 @@
     }
 
     &::placeholder {
-      color: $color-neutral-3;
-      user-select: none;
-    }
-
-    &:focus::placeholder,
-    &:focus-visible::placeholder {
-      color: var(--text);
+      color: var(--card-label);
     }
 
     &[aria-invalid="true"]::placeholder {

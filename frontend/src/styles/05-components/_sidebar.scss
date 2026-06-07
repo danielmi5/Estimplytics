@@ -1,0 +1,77 @@
+@use "../00-settings/variables" as vars;
+@use "../01-tools/mixins" as mixins;
+
+.sidebar {
+  width: 14rem;
+  min-height: 100%;
+
+  @include mixins.flex(column, 0);
+  
+  background: var(--bg-modals);
+
+  &__user {
+    @include mixins.flex(row, var(--spacing-sm), flex-start, center);
+    padding: var(--spacing-md) var(--spacing-xl);
+    overflow: hidden;
+    border-bottom: var(--border-mini) solid var(--border)
+  }
+
+  &__logo {
+    @include mixins.typography(h5, var(--text-important));
+    letter-spacing: 0.02em;
+  }
+
+  &__nav {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    list-style: none;
+    padding: var(--spacing-sm) 0;
+    margin: 0;
+  }
+
+  &__avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+
+    @include mixins.flex-center();
+
+    background: var(--button-primary-default);
+
+    @include mixins.typography(mini, vars.$text-dark);
+
+    font-weight: var(--font-weight-600);
+  }
+
+  &__user-info {
+    @include mixins.flex(column, var(--spacing-xs));
+    min-width: 0;
+  }
+
+  &__user-name {
+    overflow: hidden;
+
+    @include mixins.typography(small);
+
+    font-weight: var(--font-weight-500);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__user-role {
+    @include mixins.typography(mini, var(--card-label));
+
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}

@@ -1,0 +1,5 @@
+@use "../../01-tools/mixins" as mixins;
+
+.request-form {
+  @include mixins.flex(column, var(--spacing-lg));
+}

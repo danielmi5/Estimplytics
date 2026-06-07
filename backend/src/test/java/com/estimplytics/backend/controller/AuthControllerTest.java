@@ -5,8 +5,6 @@ import com.estimplytics.backend.dto.TokenResponseDTO;
 import com.estimplytics.backend.entity.Role;
 import com.estimplytics.backend.repository.UserRepository;
 import com.estimplytics.backend.security.JwtService;
-import com.estimplytics.backend.security.TokenBlacklistService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
@@ -41,8 +40,7 @@ class AuthControllerTest {
     @Mock
     private JwtService jwtService;
 
-    @Mock
-    private TokenBlacklistService tokenBlacklistService;
+
 
     @Mock
     private UserRepository userRepository;
@@ -50,8 +48,20 @@ class AuthControllerTest {
     @InjectMocks
     private AuthController authController;
 
+
     @Test
-    void login_shouldReturnTokenWhenCredentialsAreValid() {
+    void login_shouldThrowBadCredentialsWhenAuthenticationFails() {
+        TokenRequestDTO request = new TokenRequestDTO();
+        request.setEmail("daniel@test.com");
+        request.setPassword("nopassword");
+        AuthenticationException exception = mock(AuthenticationException.class);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(exception);
+
+        assertThatThrownBy(() -> authController.login(request)).isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void login_shouldReturnTokenWhenCredentialsAreValid_includesRefreshAndUser() {
         TokenRequestDTO request = new TokenRequestDTO();
         request.setEmail("user@test.com");
         request.setPassword("secret");
@@ -70,6 +80,7 @@ class AuthControllerTest {
                         .build()
         ));
         when(jwtService.generateToken(userDetails, "Daniel")).thenReturn("jwt-token");
+        when(jwtService.generateRefreshToken(userDetails)).thenReturn("refresh-token");
         when(jwtService.getAccessTokenSeconds()).thenReturn(3600L);
 
         ResponseEntity<TokenResponseDTO> response = authController.login(request);
@@ -77,39 +88,9 @@ class AuthControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getAccessToken()).isEqualTo("jwt-token");
+        assertThat(response.getBody().getRefreshToken()).isEqualTo("refresh-token");
         assertThat(response.getBody().getTokenType()).isEqualTo("Bearer");
         assertThat(response.getBody().getExpiresIn()).isEqualTo(3600L);
-    }
-
-    @Test
-    void login_shouldThrowBadCredentialsWhenAuthenticationFails() {
-        TokenRequestDTO request = new TokenRequestDTO();
-        request.setEmail("user@test.com");
-        request.setPassword("bad");
-        AuthenticationException exception = mock(AuthenticationException.class);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(exception);
-
-        assertThatThrownBy(() -> authController.login(request)).isInstanceOf(BadCredentialsException.class);
-    }
-
-    @Test
-    void logout_shouldBlacklistTokenWhenAuthorizationHeaderIsValid() {
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
-        when(servletRequest.getHeader("Authorization")).thenReturn("Bearer abc.def.ghi");
-
-        ResponseEntity<Void> response = authController.logout(servletRequest);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        verify(tokenBlacklistService).addToBlacklist("abc.def.ghi");
-    }
-
-    @Test
-    void logout_shouldReturnBadRequestWhenAuthorizationHeaderIsMissing() {
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
-        when(servletRequest.getHeader("Authorization")).thenReturn(null);
-
-        ResponseEntity<Void> response = authController.logout(servletRequest);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody().getUser()).isNotNull();
     }
 }

@@ -1,0 +1,70 @@
+<section class="redmine-sync-form" aria-labelledby="redmine-title">
+  <header class="redmine-sync-form__header">
+    <h2 class="redmine-sync-form__title" id="redmine-title">Sincronización con Redmine</h2>
+  </header>
+
+  <aside class="redmine-sync-form__info" role="note" aria-label="Información sobre la integración con Redmine">
+    <p class="redmine-sync-form__info-text">Conecta tu url de Redmine para sincronizar tareas y estimaciones en tiempo real. Las urls públicas (como redmine.org) no requieren API Key.</p>
+  </aside>
+
+  <form
+    class="redmine-sync-form__form"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    aria-label="Formulario de credenciales de Redmine"
+    novalidate
+  >
+    <app-form-input
+      id="redmine-url"
+      name="redmine-url"
+      label="Url de Redmine"
+      type="url"
+      placeholder="https://redmine.org"
+      formControlName="redmineUrl"
+      helpText="URL base de tu instancia de Redmine."
+    />
+
+    <div class="redmine-sync-form__api-key">
+      <div class="redmine-sync-form__api-key-header">
+        <label class="redmine-sync-form__api-key-label" for="redmine-api-key">Clave API</label>
+        <a
+          href="https://www.redmine.org/projects/redmine/wiki/Rest_api#Authentication"
+          class="redmine-sync-form__api-key-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Ver dónde encontrar la clave API de Redmine (abre en nueva pestaña)"
+        >¿Dónde encuentro esto?</a>
+      </div>
+      <app-form-input
+        id="redmine-api-key"
+        name="redmine-api-key"
+        label=""
+        type="password"
+        placeholder="Opcional para instancias públicas"
+        formControlName="apiKey"
+      />
+    </div>
+
+    <output
+      class="redmine-sync-form__status"
+      role="status"
+      aria-live="polite"
+      aria-label="Estado de conexión con Redmine"
+      [attr.data-status]="redmineService.status()"
+    >
+      <span class="redmine-sync-form__status-dot" aria-hidden="true"></span>
+      <strong class="redmine-sync-form__status-label">ESTADO: {{ redmineService.statusLabel() }}</strong>
+    </output>
+
+    <app-button
+      variant="primary"
+      label="Guardar credenciales"
+      buttonType="submit"
+      size="md"
+      [fullWidth]="true"
+      [disabled]="redmineService.isLoading()"
+      icon="save"
+      ariaLabel="Guardar credenciales de Redmine"
+    />
+  </form>
+</section>

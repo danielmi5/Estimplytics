@@ -4,6 +4,7 @@ import com.estimplytics.backend.dto.UserRequestDTO;
 import com.estimplytics.backend.dto.UserResponseDTO;
 import com.estimplytics.backend.dto.UserUpdateDTO;
 import com.estimplytics.backend.service.IUserService;
+import com.estimplytics.backend.service.OwnershipService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,6 +31,9 @@ class UserControllerTest {
 
     @Mock
     private IUserService userService;
+
+    @Mock
+    private OwnershipService ownershipService;
 
     @InjectMocks
     private UserController userController;

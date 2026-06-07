@@ -2,12 +2,15 @@ package com.estimplytics.backend.exception;
 
 import com.estimplytics.backend.dto.ApiErrorDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +34,12 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiErrorDTO> handleRequestNotFoundException(RequestNotFoundException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         return ResponseEntity.status(status).body(createErrorBody(status, request, e, "Request not found"));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorDTO> handleDataIntegrityViolationException(DataIntegrityViolationException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        return ResponseEntity.status(status).body(createErrorBody(status, request, e, "The operation conflicts with existing related data"));
     }
 
     @ExceptionHandler(ProjectNotFoundException.class)
@@ -85,6 +94,18 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(status).body(createErrorBody(status, request, e, errors.toString()));
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorDTO> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        return ResponseEntity.status(status).body(createErrorBody(status, request, e, "Access denied"));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorDTO> handleIllegalStateException(IllegalStateException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        return ResponseEntity.status(status).body(createErrorBody(status, request, e, "Operation conflict"));
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiErrorDTO> handleBadCredentialsException(BadCredentialsException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -109,6 +130,18 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(status).body(createErrorBody(status, request, e, "Redmine instance not found"));
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorDTO> handleNoResourceFoundException(NoResourceFoundException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(status).body(createErrorBody(status, request, e, "Resource not found"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorDTO> handleUnexpectedException(Exception e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(status).body(createUnexpectedErrorBody(status, request));
+    }
+
     private HttpStatus determineStatusFromErrorType(RedmineIntegrationException.ErrorType errorType) {
         return switch (errorType) {
             case INVALID_CREDENTIALS -> HttpStatus.SERVICE_UNAVAILABLE;
@@ -131,6 +164,17 @@ public class ApiExceptionHandler {
                 .error(status.getReasonPhrase())
                 .message(message)
                 .description(desc)
+                .path(request.getRequestURI())
+                .build();
+    }
+
+    private ApiErrorDTO createUnexpectedErrorBody(HttpStatus status, HttpServletRequest request) {
+        return ApiErrorDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .stateNum(status.value())
+                .error(status.getReasonPhrase())
+                .message("An unexpected error occurred")
+                .description("Internal server error")
                 .path(request.getRequestURI())
                 .build();
     }

@@ -14,11 +14,8 @@
     }
 
     &__title {
-        margin: 0;
-        color: var(--text);
-        font-family: var(--font-secondary);
+        @include mixins.typography(h3);
         font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-        font-weight: var(--font-weight-700);
     }
 
     &__subtitle {
@@ -28,8 +25,7 @@
 
     &__link {
         @include mixins.flex(row, var(--spacing-sm), flex-start, center);
-        color: var(--text-important);
-        font-size: var(--font-size-sm);
+        @include mixins.typography(small, var(--text-important));
         font-weight: var(--font-weight-600);
         text-decoration: none;
         line-height: 1;
@@ -40,79 +36,17 @@
         }
     }
 
-    &__table-wrap {
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 1.35rem;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    &__table {
-        width: 100%;
-        border-collapse: collapse;
-
-        thead {
-            background: var(--bg-cards);
-        }
-
-        th {
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-bottom: 1px solid var(--border);
-            color: var(--card-label);
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-700);
-            letter-spacing: 0.07em;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-            font-size: var(--font-size-sm);
-            text-align: center;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: var(--bg-cards);
-        }
-    }
-
-    &__table &__ticket {
-        color: var(--text-important);
-        font-family: var(--font-secondary);
-        font-weight: var(--font-weight-700);
-    }
-
-    &__table &__title {
-        max-width: 22rem;
-        color: var(--text);
-        font-weight: var(--font-weight-500);
-    }
-
-    &__table &__source {
-        display: inline-flex;
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius-full);
-        background: var(--bg);
+    &__empty {
+        margin: 0;
+        padding: var(--spacing-xl);
+        border: 1px dashed var(--border-subtle);
+        border-radius: var(--radius-md);
         color: var(--card-label);
-        font-size: var(--font-size-xs);
-        font-weight: var(--font-weight-600);
+        text-align: center;
     }
 
-    &__table &__date {
-        color: var(--card-label);
-    }
-
-    &__table &__priority {
-        font-size: var(--font-size-xs);
+    &__priority {
+        @include mixins.typography(mini);
         font-weight: var(--font-weight-700);
 
         &--high {
@@ -132,14 +66,6 @@
         &__header {
             align-items: flex-start;
             flex-direction: column;
-        }
-
-        &__table-wrap {
-            border-radius: 1rem;
-        }
-
-        &__table {
-            min-width: 44rem;
         }
     }
 }

@@ -1,0 +1,40 @@
+<aside class="sidebar" aria-label="Menú lateral de navegación">
+  @if (user()) {
+    <header class="sidebar__user" aria-label="Usuario en sesión">
+      <span class="sidebar__avatar" aria-hidden="true">
+        {{ userInitials() }}
+      </span>
+      <div class="sidebar__user-info">
+        <p class="sidebar__user-name">{{ user()?.name ?? user()?.email }}</p>
+        <p class="sidebar__user-role">{{ user()?.role }}</p>
+      </div>
+    </header>
+  }
+
+  <nav class="sidebar__nav" aria-label="Navegación principal">
+    <ul role="list">
+      @for (item of navItems; track item.route) {
+        <li>
+          <app-sidebar-nav-item
+            [label]="item.label"
+            [icon]="item.icon"
+            [route]="item.route"
+            [exact]="item.exact"
+          />
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <footer class="sidebar__footer">
+    <ul class="sidebar__actions" role="list">
+      <li>
+        <app-sidebar-nav-item
+          icon="log-out"
+          label="Cerrar sesión"
+          (itemClick)="logout()"
+        />
+      </li>
+    </ul>
+  </footer>
+</aside>

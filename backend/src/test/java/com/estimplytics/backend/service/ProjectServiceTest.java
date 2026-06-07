@@ -4,6 +4,7 @@ import com.estimplytics.backend.dto.ProjectRequestDTO;
 import com.estimplytics.backend.dto.ProjectResponseDTO;
 import com.estimplytics.backend.dto.ProjectUpdateDTO;
 import com.estimplytics.backend.entity.Project;
+import com.estimplytics.backend.entity.User;
 import com.estimplytics.backend.exception.ProjectNotFoundException;
 import com.estimplytics.backend.mapper.ProjectMapper;
 import com.estimplytics.backend.repository.ProjectRepository;
@@ -40,16 +41,37 @@ class ProjectServiceTest {
     @Mock
     private ProjectMapper projectMapper;
 
+    @Mock
+    private OwnershipService ownershipService;
+
     @InjectMocks
     private ProjectService service;
 
     @Test
-    void findAll_shouldMapPage() {
+    void findAll_shouldMapPageForAdmin() {
         Pageable pageable = PageRequest.of(0, 10);
         Project entity = mock(Project.class);
         ProjectResponseDTO response = mock(ProjectResponseDTO.class);
         Page<Project> page = new PageImpl<>(List.of(entity));
+        when(ownershipService.isAdmin()).thenReturn(true);
         when(projectRepository.findAll(pageable)).thenReturn(page);
+        when(projectMapper.toResponseDTO(entity)).thenReturn(response);
+
+        Page<ProjectResponseDTO> result = service.findAll(pageable);
+
+        assertThat(result.getContent()).containsExactly(response);
+    }
+
+    @Test
+    void findAll_shouldReturnOwnedProjectsForAnalyst() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Project entity = mock(Project.class);
+        ProjectResponseDTO response = mock(ProjectResponseDTO.class);
+        User owner = mock(User.class);
+        Page<Project> page = new PageImpl<>(List.of(entity));
+        when(ownershipService.isAdmin()).thenReturn(false);
+        when(ownershipService.currentUser()).thenReturn(owner);
+        when(projectRepository.findByOwnerOrOwnerIsNull(owner, pageable)).thenReturn(page);
         when(projectMapper.toResponseDTO(entity)).thenReturn(response);
 
         Page<ProjectResponseDTO> result = service.findAll(pageable);
@@ -76,13 +98,17 @@ class ProjectServiceTest {
         Project entity = mock(Project.class);
         Project saved = mock(Project.class);
         ProjectResponseDTO response = mock(ProjectResponseDTO.class);
+        User owner = mock(User.class);
         when(projectMapper.toEntity(request)).thenReturn(entity);
+        when(ownershipService.isAdmin()).thenReturn(false);
+        when(ownershipService.currentUser()).thenReturn(owner);
         when(projectRepository.save(entity)).thenReturn(saved);
         when(projectMapper.toResponseDTO(saved)).thenReturn(response);
 
         ProjectResponseDTO result = service.create(request);
 
         assertThat(result).isSameAs(response);
+        verify(entity).setOwner(owner);
     }
 
     @Test
@@ -99,6 +125,7 @@ class ProjectServiceTest {
         ProjectResponseDTO result = service.update(id, update);
 
         assertThat(result).isSameAs(response);
+        verify(ownershipService).requireProjectOwner(entity);
         verify(projectMapper).updateEntityFromDTO(update, entity);
     }
 
@@ -114,18 +141,20 @@ class ProjectServiceTest {
     @Test
     void delete_shouldDeleteByIdWhenExists() {
         UUID id = UUID.randomUUID();
-        when(projectRepository.existsById(id)).thenReturn(true);
+        Project project = mock(Project.class);
+        when(projectRepository.findById(id)).thenReturn(Optional.of(project));
         when(requestRepository.existsByProjectId(id)).thenReturn(false);
 
         service.delete(id);
 
-        verify(projectRepository).deleteById(id);
+        verify(ownershipService).requireProjectOwner(project);
+        verify(projectRepository).delete(project);
     }
 
     @Test
     void delete_shouldThrowWhenEntityMissing() {
         UUID id = UUID.randomUUID();
-        when(projectRepository.existsById(id)).thenReturn(false);
+        when(projectRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(ProjectNotFoundException.class);
     }
@@ -133,7 +162,8 @@ class ProjectServiceTest {
     @Test
     void delete_shouldThrowWhenProjectHasRequests() {
         UUID id = UUID.randomUUID();
-        when(projectRepository.existsById(id)).thenReturn(true);
+        Project project = mock(Project.class);
+        when(projectRepository.findById(id)).thenReturn(Optional.of(project));
         when(requestRepository.existsByProjectId(id)).thenReturn(true);
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(IllegalArgumentException.class);

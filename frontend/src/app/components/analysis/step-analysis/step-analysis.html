@@ -1,0 +1,154 @@
+<div class="step-section">
+  <article
+    class="step-card"
+    [class.step-card--completed]="state() === 'completed'"
+    [class.step-card--active]="state() === 'active'"
+    [class.step-card--inactive]="state() === 'inactive'"
+  >
+    @if (state() !== 'completed') {
+      <header class="step-card__header">
+        <span
+          class="step-card__badge"
+          [class.step-card__badge--success]="state() === 'completed'"
+          [class.step-card__badge--active]="state() === 'active'"
+          [class.step-card__badge--inactive]="state() === 'inactive'"
+          aria-hidden="true"
+        >1</span>
+        <h2 class="step-card__title">Contexto y Solución</h2>
+      </header>
+    }
+
+    @if (state() === 'active') {
+      <div class="step-card__body step-analysis">
+        <form class="step-analysis__form" [formGroup]="form" novalidate aria-label="Análisis de impacto">
+          <app-form-textarea
+            id="analysis-descripcion-abreviada"
+            name="descripcionAbreviada"
+            label="Descripción abreviada"
+            placeholder="Resumen breve del alcance"
+            formControlName="descripcionAbreviada"
+            [required]="true"
+            [validationState]="fieldState('descripcionAbreviada')"
+            [errorMessage]="fieldMessage('descripcionAbreviada', 'error')"
+            [warningMessage]="fieldMessage('descripcionAbreviada', 'warning')"
+            [successMessage]="fieldMessage('descripcionAbreviada', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          <app-form-textarea
+            id="analysis-descripcion-impacto"
+            name="descripcionImpacto"
+            label="Descripción del impacto"
+            placeholder="Componentes y áreas afectadas"
+            formControlName="descripcionImpacto"
+            [required]="true"
+            [validationState]="fieldState('descripcionImpacto')"
+            [errorMessage]="fieldMessage('descripcionImpacto', 'error')"
+            [warningMessage]="fieldMessage('descripcionImpacto', 'warning')"
+            [successMessage]="fieldMessage('descripcionImpacto', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          <app-form-textarea
+            id="analysis-descripcion-solucion"
+            name="descripcionSolucion"
+            label="Descripción de la solución"
+            placeholder="Enfoque técnico propuesto"
+            formControlName="descripcionSolucion"
+            [required]="true"
+            [validationState]="fieldState('descripcionSolucion')"
+            [errorMessage]="fieldMessage('descripcionSolucion', 'error')"
+            [warningMessage]="fieldMessage('descripcionSolucion', 'warning')"
+            [successMessage]="fieldMessage('descripcionSolucion', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          <app-form-textarea
+            id="analysis-requisitos"
+            name="requisitosFuncionales"
+            label="Requisitos funcionales"
+            placeholder="RF01, RF02..."
+            formControlName="requisitosFuncionales"
+            [required]="true"
+            [validationState]="fieldState('requisitosFuncionales')"
+            [errorMessage]="fieldMessage('requisitosFuncionales', 'error')"
+            [warningMessage]="fieldMessage('requisitosFuncionales', 'warning')"
+            [successMessage]="fieldMessage('requisitosFuncionales', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          <app-form-textarea
+            id="analysis-pruebas"
+            name="pruebas"
+            label="Pruebas"
+            placeholder="Casos de prueba"
+            formControlName="pruebas"
+            [required]="true"
+            [validationState]="fieldState('pruebas')"
+            [errorMessage]="fieldMessage('pruebas', 'error')"
+            [warningMessage]="fieldMessage('pruebas', 'warning')"
+            [successMessage]="fieldMessage('pruebas', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          <app-form-select
+            id="analysis-complexity"
+            name="complexity"
+            label="Complejidad"
+            formControlName="complexity"
+            [required]="true"
+            [options]="complexityOptions"
+            [validationState]="fieldState('complexity')"
+            [errorMessage]="fieldMessage('complexity', 'error')"
+            [warningMessage]="fieldMessage('complexity', 'warning')"
+            [successMessage]="fieldMessage('complexity', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          <app-form-input
+            id="analysis-version"
+            name="versionNumber"
+            label="Versión"
+            type="number"
+            formControlName="versionNumber"
+            [required]="true"
+            min="1"
+            [validationState]="fieldState('versionNumber')"
+            [errorMessage]="fieldMessage('versionNumber', 'error')"
+            [warningMessage]="fieldMessage('versionNumber', 'warning')"
+            [successMessage]="fieldMessage('versionNumber', 'success')"
+            [showSuccessMessage]="true"
+          />
+
+          @if (submitError()) {
+            <p class="step-analysis__error" role="alert">{{ submitError() }}</p>
+          }
+        </form>
+
+        <div class="step-card__actions">
+          <app-button
+            variant="primary"
+            label="Continuar"
+            buttonType="button"
+            [disabled]="form.invalid || isSubmitting()"
+            (pressed)="submit()"
+          />
+        </div>
+      </div>
+    }
+
+    @if (state() === 'completed' && summary()) {
+      <header class="step-card__header step-card__header--completed">
+        <span class="step-card__badge step-card__badge--success" aria-hidden="true">
+          <span [feather]="'check'"></span>
+        </span>
+        <h2 class="step-card__title">Paso 1: Contexto y Solución</h2>
+        <button type="button" class="step-card__edit" aria-label="Editar paso 1" (click)="onEdit()">
+          <span [feather]="'edit-2'" variant="botones"></span>
+        </button>
+      </header>
+
+      <p class="step-card__summary-text">{{ completedSummary() }}</p>
+    }
+  </article>
+</div>

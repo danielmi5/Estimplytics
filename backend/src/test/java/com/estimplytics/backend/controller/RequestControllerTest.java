@@ -39,12 +39,26 @@ class RequestControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         RequestResponseDTO dto = mock(RequestResponseDTO.class);
         Page<RequestResponseDTO> page = new PageImpl<>(List.of(dto));
-        when(service.findAll(pageable)).thenReturn(page);
+        when(service.findAll(pageable, null)).thenReturn(page);
 
-        ResponseEntity<Page<RequestResponseDTO>> response = controller.getAll(pageable);
+        ResponseEntity<Page<RequestResponseDTO>> response = controller.getAll(pageable, null);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isSameAs(page);
+    }
+
+    @Test
+    void getAll_shouldPassSearchParamToService() {
+        Pageable pageable = PageRequest.of(0, 10);
+        RequestResponseDTO dto = mock(RequestResponseDTO.class);
+        Page<RequestResponseDTO> page = new PageImpl<>(List.of(dto));
+        when(service.findAll(pageable, "facturación")).thenReturn(page);
+
+        ResponseEntity<Page<RequestResponseDTO>> response = controller.getAll(pageable, "facturación");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isSameAs(page);
+        verify(service).findAll(pageable, "facturación");
     }
 
     @Test

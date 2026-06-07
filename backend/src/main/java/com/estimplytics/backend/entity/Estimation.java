@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -22,20 +24,27 @@ public class Estimation {
     @JoinColumn(name = "analysis_id", nullable = false)
     private ImpactAnalysis analysis;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "estimation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EstimationHistory> histories = new ArrayList<>();
+
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber;
 
     @Column(name = "fiability")
     private Integer fiability;
 
-    @Column(name = "hours_an")
-    private Integer hoursAn;
+    @Column(name = "hours_planning")
+    private Integer hoursPlanning;
 
-    @Column(name = "hours_as")
-    private Integer hoursAs;
+    @Column(name = "hours_analysis")
+    private Integer hoursAnalysis;
 
-    @Column(name = "hours_de")
-    private Integer hoursDe;
+    @Column(name = "hours_development")
+    private Integer hoursDevelopment;
+
+    @Column(name = "hours_testing")
+    private Integer hoursTesting;
 
     @Column(name = "total_hours")
     private Integer totalHours;

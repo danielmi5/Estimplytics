@@ -18,9 +18,10 @@ public class EstimationMapper implements IMapper<Estimation, EstimationRequestDT
             estimation.setVersionNumber(dto.getVersionNumber());
         }
         estimation.setFiability(dto.getFiability());
-        estimation.setHoursAn(dto.getHoursAn());
-        estimation.setHoursAs(dto.getHoursAs());
-        estimation.setHoursDe(dto.getHoursDe());
+        estimation.setHoursPlanning(dto.getHoursPlanning());
+        estimation.setHoursAnalysis(dto.getHoursAnalysis());
+        estimation.setHoursDevelopment(dto.getHoursDevelopment());
+        estimation.setHoursTesting(dto.getHoursTesting());
         estimation.setTotalHours(dto.getTotalHours());
         estimation.setActualHoursFeedback(dto.getActualHoursFeedback());
         estimation.setJustification(dto.getJustification());
@@ -42,9 +43,10 @@ public class EstimationMapper implements IMapper<Estimation, EstimationRequestDT
                 .analysisId(entity.getAnalysis() != null ? entity.getAnalysis().getId() : null)
                 .versionNumber(entity.getVersionNumber())
                 .fiability(entity.getFiability())
-                .hoursAn(entity.getHoursAn())
-                .hoursAs(entity.getHoursAs())
-                .hoursDe(entity.getHoursDe())
+                .hoursPlanning(entity.getHoursPlanning())
+                .hoursAnalysis(entity.getHoursAnalysis())
+                .hoursDevelopment(entity.getHoursDevelopment())
+                .hoursTesting(entity.getHoursTesting())
                 .totalHours(entity.getTotalHours())
                 .actualHoursFeedback(entity.getActualHoursFeedback())
                 .justification(entity.getJustification())
@@ -61,14 +63,17 @@ public class EstimationMapper implements IMapper<Estimation, EstimationRequestDT
         if (dto.getFiability() != null) {
             entity.setFiability(dto.getFiability());
         }
-        if (dto.getHoursAn() != null) {
-            entity.setHoursAn(dto.getHoursAn());
+        if (dto.getHoursPlanning() != null) {
+            entity.setHoursPlanning(dto.getHoursPlanning());
         }
-        if (dto.getHoursAs() != null) {
-            entity.setHoursAs(dto.getHoursAs());
+        if (dto.getHoursAnalysis() != null) {
+            entity.setHoursAnalysis(dto.getHoursAnalysis());
         }
-        if (dto.getHoursDe() != null) {
-            entity.setHoursDe(dto.getHoursDe());
+        if (dto.getHoursDevelopment() != null) {
+            entity.setHoursDevelopment(dto.getHoursDevelopment());
+        }
+        if (dto.getHoursTesting() != null) {
+            entity.setHoursTesting(dto.getHoursTesting());
         }
         if (dto.getTotalHours() != null) {
             entity.setTotalHours(dto.getTotalHours());

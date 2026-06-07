@@ -1,6 +1,7 @@
 import { AbstractControl } from '@angular/forms';
 
 export type RegisterFieldName = 'name' | 'email' | 'password' | 'confirmPassword' | 'acceptTerms';
+export type ProfileFieldName = 'name' | 'email' | 'password';
 export type RegisterFieldState = 'initial' | 'warning' | 'error' | 'success';
 
 const messages = {
@@ -109,4 +110,37 @@ export function getRegisterFieldMessage(fieldName: RegisterFieldName, control: A
 
 export function getRegisterSubmitLabel(isPending: boolean): string {
 	return isPending ? 'Validando...' : 'Registrarse';
+}
+
+const hasValue = (control: AbstractControl): boolean => {
+	const value = control.value;
+	return typeof value === 'string' ? value.trim().length > 0 : Boolean(value);
+};
+
+export function getProfileFieldState(control: AbstractControl | null, force = false): RegisterFieldState {
+	if (!control || !touchedOrDirty(control, force)) {
+		return 'initial';
+	}
+
+	if (control.pending) {
+		return 'initial';
+	}
+
+	if (!hasValue(control)) {
+		return 'initial';
+	}
+
+	if (control.valid) {
+		return 'success';
+	}
+
+	return 'error';
+}
+
+export function getProfileFieldMessage(
+	fieldName: ProfileFieldName,
+	control: AbstractControl | null,
+	state: RegisterFieldState
+): string {
+	return getRegisterFieldMessage(fieldName, control, state);
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 public interface ICrudController<Request, Response, Update, ID> {
     
@@ -38,7 +39,7 @@ public interface ICrudController<Request, Response, Update, ID> {
         @ApiResponse(responseCode = "400", description = "Invalid data"),
         @ApiResponse(responseCode = "401", description = "Unauthenticated")
     })
-    ResponseEntity<Response> create(@RequestBody Request request);
+    ResponseEntity<Response> create(@Valid @RequestBody Request request);
     
     @PutMapping("/{id}")
     @Operation(summary = "Update a record", description = "Updates an existing record with new data")
@@ -48,7 +49,7 @@ public interface ICrudController<Request, Response, Update, ID> {
         @ApiResponse(responseCode = "400", description = "Invalid data"),
         @ApiResponse(responseCode = "401", description = "Unauthenticated")
     })
-    ResponseEntity<Response> update(@PathVariable ID id, @RequestBody Update updateRequest);
+    ResponseEntity<Response> update(@PathVariable ID id, @Valid @RequestBody Update updateRequest);
     
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a record", description = "Deletes a specific record by its identifier")

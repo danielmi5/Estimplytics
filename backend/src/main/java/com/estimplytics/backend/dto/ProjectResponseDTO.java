@@ -26,4 +26,7 @@ public class ProjectResponseDTO {
 
     @Schema(description = "Project creation date and time", example = "2026-05-08T08:00:00")
     private LocalDateTime createdAt;
+
+    @Schema(description = "Owner identifier for manual projects")
+    private UUID ownerId;
 }

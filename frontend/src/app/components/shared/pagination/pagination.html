@@ -1,0 +1,47 @@
+<nav class="pagination" aria-label="Paginación">
+  <p class="pagination__summary">
+    Mostrando {{ showingCount() }} de {{ totalElements() }} resultados
+  </p>
+
+  @if (totalPages() > 1) {
+    <div class="pagination__controls">
+      <app-button
+        variant="secondary"
+        size="sm"
+        label="Anterior"
+        ariaLabel="Página anterior"
+        [disabled]="page() === 0"
+        (pressed)="goToPage(page() - 1)"
+      />
+
+      @for (item of pageItems(); track $index) {
+        @if (item.kind === 'separator') {
+          <app-button
+            variant="secondary"
+            size="sm"
+            label="…"
+            ariaLabel="Más páginas"
+            [disabled]="true"
+          />
+        } @else {
+          <app-button
+            [variant]="item.page === page() ? 'primary' : 'secondary'"
+            size="sm"
+            [label]="'' + (item.page + 1)"
+            [ariaLabel]="'Página ' + (item.page + 1)"
+            (pressed)="goToPage(item.page)"
+          />
+        }
+      }
+
+      <app-button
+        variant="secondary"
+        size="sm"
+        label="Siguiente"
+        ariaLabel="Página siguiente"
+        [disabled]="page() >= totalPages() - 1"
+        (pressed)="goToPage(page() + 1)"
+      />
+    </div>
+  }
+</nav>

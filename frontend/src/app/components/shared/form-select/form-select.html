@@ -1,0 +1,64 @@
+<div
+  class="form-select"
+  [class.form-select--success]="getEffectiveState() === 'success'"
+  [class.form-select--warning]="getEffectiveState() === 'warning'"
+  [class.form-select--error]="getEffectiveState() === 'error'"
+  [class.form-select--disabled]="isDisabled()"
+>
+  <label class="form-select__label" [for]="id()">
+    <span class="form-select__label-text">{{ label() }}</span>
+    @if (required()) {
+      <span class="form-select__label-required" aria-hidden="true">*</span>
+    }
+  </label>
+
+  <div class="form-select__input-container">
+    <select
+      class="form-select__field"
+      [id]="id()"
+      [name]="name()"
+      [disabled]="isDisabled()"
+      [value]="value"
+      (change)="onSelect($event)"
+      (blur)="onBlur()"
+      [attr.aria-disabled]="isDisabled() ? 'true' : null"
+      [attr.aria-required]="required() ? 'true' : null"
+      [attr.aria-invalid]="getEffectiveState() === 'error' ? 'true' : 'false'"
+      [attr.aria-describedby]="id() + '-message'"
+      [required]="required()"
+    >
+      @if (placeholder()) {
+        <option value="" disabled>{{ placeholder() }}</option>
+      }
+      @for (option of options(); track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+
+    <span class="form-select__icon form-select__icon--right" aria-hidden="true">
+      <span [feather]="getRightIcon() ?? 'chevron-down'" [variant]="'botones'"></span>
+    </span>
+  </div>
+
+  @if (getEffectiveState() === 'initial' && helpText()) {
+    <small class="form-select__message" [id]="id() + '-message'">{{ helpText() }}</small>
+  }
+
+  @if (getEffectiveState() === 'warning' && warningMessage()) {
+    <small class="form-select__message form-select__message--warning" [id]="id() + '-message'" role="alert">
+      {{ warningMessage() }}
+    </small>
+  }
+
+  @if (getEffectiveState() === 'error' && errorMessage()) {
+    <small class="form-select__message form-select__message--error" [id]="id() + '-message'" role="alert">
+      {{ errorMessage() }}
+    </small>
+  }
+
+  @if (getEffectiveState() === 'success' && showSuccessMessage()) {
+    <small class="form-select__message form-select__message--success" [id]="id() + '-message'">
+      {{ successMessage() }}
+    </small>
+  }
+</div>

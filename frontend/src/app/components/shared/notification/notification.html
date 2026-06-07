@@ -1,0 +1,13 @@
+<ol class="notification-list" aria-label="Notificaciones" aria-live="polite" aria-atomic="false">
+  @for (item of notificationService.notifications(); track item.id) {
+    <li class="notification notification--{{ item.type }}" role="alert">
+      <p class="notification__message">{{ item.message }}</p>
+      <button
+        class="notification__close"
+        type="button"
+        aria-label="Cerrar notificación"
+        (click)="notificationService.remove(item.id)"
+      >X</button>
+    </li>
+  }
+</ol>

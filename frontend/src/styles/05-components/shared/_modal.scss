@@ -1,0 +1,74 @@
+@use "../../01-tools/mixins" as mixins;
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+
+  @include mixins.flex(row, 0, center, center);
+
+  padding: var(--spacing-xl);
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: hsl(210 12% 15% / 0.55);
+  }
+
+  &__panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 36rem);
+    max-height: calc(100vh - var(--spacing-3xl));
+    overflow: auto;
+
+    @include mixins.flex(column, 0);
+
+    padding: var(--spacing-xl);
+    border-top: var(--spacing-sm) solid var(--button-primary-default);
+    border-radius: var(--radius-sm);
+    background: var(--bg-modals);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__header {
+    @include mixins.flex(row, var(--spacing-md), space-between, center);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  &__title {
+    margin: 0;
+    @include mixins.typography(h3);
+  }
+
+  &__close {
+    @include mixins.flex-center();
+    flex-shrink: 0;
+    padding: var(--spacing-xs);
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--text-important);
+    }
+
+    &:focus-visible {
+      outline: var(--border-medium) solid var(--text-important);
+      outline-offset: var(--border-medium);
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  &__body {
+    @include mixins.flex(column, var(--spacing-lg));
+  }
+
+  &__footer {
+    @include mixins.flex(row, var(--spacing-md), flex-end, stretch);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-xl);
+  }
+}

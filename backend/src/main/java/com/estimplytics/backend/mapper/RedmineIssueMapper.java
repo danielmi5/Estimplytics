@@ -16,7 +16,7 @@ public class RedmineIssueMapper {
 
     public void updateEntityAndMetadataFromDto(RedmineIssueDTO dto, Request request, RedmineIssueMetadata metadata) {
         metadata.setRedmineId(dto.getId());
-        metadata.setOriginRequestCode("REDMINE-%s".formatted(dto.getId()));
+        request.setOriginRequestCode("REDMINE-%s".formatted(dto.getId()));
 
         if (dto.getProject() == null || dto.getProject().getName() == null || dto.getProject().getName().isBlank()) {
             throw new RedmineMandatoryFieldException("Project is required but was null or empty in Redmine issue %s".formatted(dto.getId()));
@@ -40,7 +40,9 @@ public class RedmineIssueMapper {
         metadata.setRawStatus(statusName);
 
         if (dto.getPriority() == null || dto.getPriority().getName() == null || dto.getPriority().getName().isBlank()) {
-            throw new RedmineMandatoryFieldException("Priority is required but was null or empty in Redmine issue %s".formatted(dto.getId()));
+            request.setPriority("Normal");
+        } else {
+            request.setPriority(dto.getPriority().getName());
         }
 
         metadata.setAuthorName(dto.getAuthor() != null ? dto.getAuthor().getName() : null);
@@ -53,7 +55,6 @@ public class RedmineIssueMapper {
         request.setTitle(dto.getSubject());
         request.setDescription(dto.getDescription());
         request.setStatus(mapStatus(statusName));
-        request.setPriority(dto.getPriority().getName());
         request.setDemandType(dto.getTracker().getName());
         request.setStartDate(parseDateSafe(dto.getStartDate()));
         request.setEndDate(parseDateSafe(dto.getDueDate()));

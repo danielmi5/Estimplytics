@@ -13,10 +13,14 @@
       <p class="activity__subtitle">Últimos movimientos</p>
     </header>
 
-    <section class="activity__grid">
-      @for (activity of activities(); track activity.id) {
-        <app-activity-card [activity]="activity"></app-activity-card>
-      }
-    </section>
+    @if (activities().length === 0) {
+      <p class="activity__empty">No hay actividad reciente en el historial.</p>
+    } @else {
+      <section class="activity__grid">
+        @for (activity of activities(); track activity.id) {
+          <app-activity-card [activity]="activity"></app-activity-card>
+        }
+      </section>
+    }
   </section>
 </section>

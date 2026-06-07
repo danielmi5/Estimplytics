@@ -1,0 +1,96 @@
+@use '../../01-tools/mixins' as mixins;
+
+.step-components {
+  &__layout {
+    @include mixins.flex(row, var(--spacing-lg), space-between, flex-start);
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__tree,
+  &__tags {
+    flex: 1;
+    min-width: 0;
+    padding: var(--spacing-md);
+    border: var(--border-thin) solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+  }
+
+  &__tree-root,
+  &__children,
+  &__tag-list,
+  &__summary-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__empty {
+    margin: 0;
+    @include mixins.typography(small, var(--color-neutral-4));
+  }
+
+  &__error {
+    color: var(--color-error);
+  }
+
+  &__category {
+    @include mixins.flex(column, var(--spacing-sm));
+
+    &:not(:last-child) {
+      margin-bottom: var(--spacing-md);
+    }
+  }
+
+  &__panel-title {
+    margin: 0 0 var(--spacing-sm);
+    @include mixins.typography(h6);
+  }
+
+  &__children {
+    @include mixins.flex(column, var(--spacing-sm));
+    padding-left: var(--spacing-md);
+  }
+
+  &__leaf {
+    list-style: none;
+  }
+
+  &__tag-list {
+    @include mixins.flex(row, var(--spacing-sm), flex-start, center);
+    flex-wrap: wrap;
+  }
+
+  &__tag {
+    @include mixins.flex(row, var(--spacing-xs), flex-start, center);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    background: var(--color-primary-lightest);
+    color: var(--text);
+    @include mixins.typography(small);
+  }
+
+  &__tag-remove {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 var(--spacing-xs);
+    @include mixins.typography(small, var(--color-error));
+
+    &:focus-visible {
+      outline: var(--border-medium) solid var(--color-primary-base);
+      outline-offset: var(--spacing-xs);
+    }
+  }
+
+  &__summary-list {
+    @include mixins.flex(column, var(--spacing-sm));
+
+    li {
+      @include mixins.typography(paragraph);
+    }
+  }
+}

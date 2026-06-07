@@ -11,6 +11,8 @@ import java.util.UUID;
 
 @Repository
 public interface ComponentAnalysisRepository extends JpaRepository<ComponentAnalysis, UUID> {
+    List<ComponentAnalysis> findByAnalysis_Id(UUID analysisId);
+
     @Query("SELECT ca.component.id FROM ComponentAnalysis ca WHERE ca.analysis.id = :analysisId")
     List<UUID> findComponentIdsByAnalysisId(@Param("analysisId") UUID analysisId);
 

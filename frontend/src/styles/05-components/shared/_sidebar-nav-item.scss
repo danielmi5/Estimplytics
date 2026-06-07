@@ -1,0 +1,63 @@
+@use "../../00-settings/variables" as vars;
+@use "../../01-tools/mixins" as mixins;
+
+.sidebar-nav-item {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-xl);
+
+  @include mixins.flex(row, var(--spacing-md), flex-start, center);
+
+  border: none;
+  border-left: 0.25rem solid transparent;
+
+  background: none;
+
+  @include mixins.typography(small, var(--text));
+  font-weight: var(--font-weight-500);
+  text-align: left;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition:
+    color var(--transition-fast) ease,
+    background-color var(--transition-fast) ease,
+    border-left-color var(--transition-fast) ease;
+
+  &__icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+
+    @include mixins.flex-center();
+
+    .feather-icon,
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &__label {
+    flex: 1;
+  }
+
+  
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-category-5);
+  }
+
+  &:focus-visible {
+    outline: var(--border-medium) solid var(--text-important);
+    outline-offset: calc(-1 * var(--border-medium));
+  }
+
+  &--active {
+    border-left-color: var(--text-important);
+    background-color: var(--bg-subtle-hover);
+    color: var(--text-important);
+    font-weight: var(--font-weight-600);
+  }
+}

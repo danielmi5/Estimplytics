@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -42,6 +43,11 @@ public class ComponentAnalysisController implements IComponentAnalysisController
     @Override
     public ResponseEntity<ComponentAnalysisResponseDTO> update(UUID id, ComponentAnalysisUpdateDTO request) {
         return ResponseEntity.ok(service.update(id, request));
+    }
+
+    @Override
+    public ResponseEntity<List<ComponentAnalysisResponseDTO>> getByAnalysisId(UUID analysisId) {
+        return ResponseEntity.ok(service.findByAnalysisId(analysisId));
     }
 
     @Override

@@ -95,6 +95,28 @@ class ImpactAnalysisControllerTest {
     }
 
     @Test
+    void getByRequestId_shouldReturnOkWhenExists() {
+        UUID requestId = UUID.randomUUID();
+        ImpactAnalysisResponseDTO dto = mock(ImpactAnalysisResponseDTO.class);
+        when(service.findByRequestId(requestId)).thenReturn(Optional.of(dto));
+
+        ResponseEntity<ImpactAnalysisResponseDTO> response = controller.getByRequestId(requestId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isSameAs(dto);
+    }
+
+    @Test
+    void getByRequestId_shouldReturnNotFoundWhenMissing() {
+        UUID requestId = UUID.randomUUID();
+        when(service.findByRequestId(requestId)).thenReturn(Optional.empty());
+
+        ResponseEntity<ImpactAnalysisResponseDTO> response = controller.getByRequestId(requestId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void delete_shouldReturnNoContent() {
         UUID id = UUID.randomUUID();
 

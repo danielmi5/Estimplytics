@@ -4,6 +4,7 @@ import com.estimplytics.backend.dto.UserRequestDTO;
 import com.estimplytics.backend.dto.UserResponseDTO;
 import com.estimplytics.backend.dto.UserUpdateDTO;
 import com.estimplytics.backend.service.IUserService;
+import com.estimplytics.backend.service.OwnershipService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +18,11 @@ import java.util.UUID;
 public class UserController implements IUserController {
 
     private final IUserService userService;
+    private final OwnershipService ownershipService;
 
-    public UserController(IUserService userService) {
+    public UserController(IUserService userService, OwnershipService ownershipService) {
         this.userService = userService;
+        this.ownershipService = ownershipService;
     }
 
     @Override
@@ -42,8 +45,8 @@ public class UserController implements IUserController {
 
     @Override
     public ResponseEntity<UserResponseDTO> update(UUID id, UserUpdateDTO request) {
-        UserResponseDTO response = userService.update(id, request);
-        return ResponseEntity.ok(response);
+        ownershipService.requireUserOrAdmin(id);
+        return ResponseEntity.ok(userService.update(id, request));
     }
 
     @Override

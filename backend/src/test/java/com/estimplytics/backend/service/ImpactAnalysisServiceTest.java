@@ -4,9 +4,12 @@ import com.estimplytics.backend.dto.ImpactAnalysisRequestDTO;
 import com.estimplytics.backend.dto.ImpactAnalysisResponseDTO;
 import com.estimplytics.backend.dto.ImpactAnalysisUpdateDTO;
 import com.estimplytics.backend.entity.ImpactAnalysis;
+import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.ImpactAnalysisNotFoundException;
 import com.estimplytics.backend.mapper.ImpactAnalysisMapper;
 import com.estimplytics.backend.repository.ImpactAnalysisRepository;
+import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
+import com.estimplytics.backend.repository.RequestRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,8 +26,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +38,18 @@ class ImpactAnalysisServiceTest {
 
     @Mock
     private ImpactAnalysisMapper mapper;
+
+    @Mock
+    private DocxGeneratorService docxGeneratorService;
+
+    @Mock
+    private RedmineIssueMetadataRepository redmineIssueMetadataRepository;
+
+    @Mock
+    private RequestRepository requestRepository;
+
+    @Mock
+    private OwnershipService ownershipService;
 
     @InjectMocks
     private ImpactAnalysisService service;
@@ -68,27 +83,41 @@ class ImpactAnalysisServiceTest {
 
     @Test
     void create_shouldPersistAndMapEntity() {
-        ImpactAnalysisRequestDTO request = mock(ImpactAnalysisRequestDTO.class);
+        UUID requestId = UUID.randomUUID();
+        Request request = mock(Request.class);
+        Request managedRequest = mock(Request.class);
+        ImpactAnalysisRequestDTO requestDto = mock(ImpactAnalysisRequestDTO.class);
         ImpactAnalysis entity = mock(ImpactAnalysis.class);
         ImpactAnalysis saved = mock(ImpactAnalysis.class);
         ImpactAnalysisResponseDTO response = mock(ImpactAnalysisResponseDTO.class);
-        when(mapper.toEntity(request)).thenReturn(entity);
+        when(mapper.toEntity(requestDto)).thenReturn(entity);
+        when(entity.getRequest()).thenReturn(request);
+        when(request.getId()).thenReturn(requestId);
+        when(requestRepository.findById(requestId)).thenReturn(Optional.of(managedRequest));
         when(repository.save(entity)).thenReturn(saved);
         when(mapper.toResponseDTO(saved)).thenReturn(response);
 
-        ImpactAnalysisResponseDTO result = service.create(request);
+        ImpactAnalysisResponseDTO result = service.create(requestDto);
 
         assertThat(result).isSameAs(response);
+        verify(ownershipService).requireEditAndRenew(managedRequest);
+        verify(requestRepository).save(managedRequest);
     }
 
     @Test
     void update_shouldPersistAndMapWhenEntityExists() {
         UUID id = UUID.randomUUID();
+        UUID requestId = UUID.randomUUID();
+        Request request = mock(Request.class);
+        Request managedRequest = mock(Request.class);
         ImpactAnalysisUpdateDTO update = mock(ImpactAnalysisUpdateDTO.class);
         ImpactAnalysis entity = mock(ImpactAnalysis.class);
         ImpactAnalysis saved = mock(ImpactAnalysis.class);
         ImpactAnalysisResponseDTO response = mock(ImpactAnalysisResponseDTO.class);
         when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(entity.getRequest()).thenReturn(request);
+        when(request.getId()).thenReturn(requestId);
+        when(requestRepository.findById(requestId)).thenReturn(Optional.of(managedRequest));
         when(repository.save(entity)).thenReturn(saved);
         when(mapper.toResponseDTO(saved)).thenReturn(response);
 
@@ -123,5 +152,18 @@ class ImpactAnalysisServiceTest {
         when(repository.existsById(id)).thenReturn(false);
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(ImpactAnalysisNotFoundException.class);
+    }
+
+    @Test
+    void findByRequestId_shouldMapWhenEntityExists() {
+        UUID requestId = UUID.randomUUID();
+        ImpactAnalysis entity = mock(ImpactAnalysis.class);
+        ImpactAnalysisResponseDTO response = mock(ImpactAnalysisResponseDTO.class);
+        when(repository.findByRequest_Id(requestId)).thenReturn(Optional.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(response);
+
+        Optional<ImpactAnalysisResponseDTO> result = service.findByRequestId(requestId);
+
+        assertThat(result).contains(response);
     }
 }

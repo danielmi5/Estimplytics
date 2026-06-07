@@ -1,5 +1,6 @@
 export interface RequestRequest {
-  projectId: string;
+  projectId?: string;
+  projectName?: string;
   demandType?: string;
   title: string;
   description?: string;
@@ -34,6 +35,10 @@ export interface RequestResponse {
   estimatedHours?: number;
   spentHours?: number;
   createdDate: string;
+  ownerId?: string;
+  analysedById?: string;
+  analysedByName?: string;
+  analysedAt?: string;
 }
 
 export interface RequestUpdate {

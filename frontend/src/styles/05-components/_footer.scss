@@ -6,8 +6,8 @@
 .footer {
 	padding: var(--spacing-2xl) var(--spacing-3xl);
 
-	background-color: var(--bg-footer);
-	color: var(--link-footer);
+	background-color: $bg-footer-light;
+	color: $link-footer-light;
 
 	&__top {
 		max-width: var(--container-max-width, 80rem);
@@ -18,25 +18,19 @@
 		grid-template-columns: 2fr 1fr 1fr 1fr;
 		gap: var(--spacing-2xl);
 
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid $color-neutral-5;
 	}
 
 	&__brand {
 		@include mixins.flex(column, var(--spacing-sm));
 
 		&-name {
-			font-family: var(--font-secondary);
-			font-size: var(--font-size-xl);
-			font-weight: var(--font-weight-700);
-
-			color: $color-neutral-1;
+			@include mixins.typography(h5, $color-neutral-1);
 		}
 
 		&-description {
 			max-width: 320px;
-
-			color: $color-neutral-3;
-			font-size: var(--font-size-sm);
+			@include mixins.typography(small, $color-neutral-3);
 			line-height: var(--line-height-relaxed);
 		}
 	}
@@ -45,12 +39,10 @@
 		@include mixins.flex(column, var(--spacing-sm), flex-start, flex-start);
 
 		&-title {
-			letter-spacing: 0.05em;
+			@include mixins.typography(small, $color-neutral-1);
 
-			color: $color-neutral-1;
-			font-family: var(--font-secondary);
-			font-size: var(--font-size-sm);
 			font-weight: var(--font-weight-600);
+			letter-spacing: 0.05em;
 			text-transform: uppercase;
 		}
 
@@ -110,8 +102,7 @@
 
 	&__copyright,
 	&__version {
-		color: $color-neutral-4;
-		font-size: var(--font-size-sm);
+		@include mixins.typography(small, $color-neutral-4);
 	}
 
 	@media (max-width: $breakpoint-sm) {

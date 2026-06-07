@@ -1,0 +1,188 @@
+@use '../../01-tools/mixins' as mixins;
+
+$step-estimation-circle-color: #446d82;
+
+.step-estimation {
+  &__empty {
+    margin: 0;
+    @include mixins.typography(small, var(--color-neutral-4));
+  }
+
+  &__error {
+    color: var(--color-error);
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    align-items: stretch;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__circle-wrap {
+    @include mixins.flex-center;
+    min-width: 0;
+    padding: var(--spacing-md);
+  }
+
+  &__circle {
+    --circle-percent: 0;
+    width: min(100%, calc(var(--spacing-3xl) * 3));
+    aspect-ratio: 1;
+    border-radius: var(--radius-full);
+    background: conic-gradient(
+      $step-estimation-circle-color calc(var(--circle-percent) * 1%),
+      hsl(201, 18%, 88%) 0
+    );
+    @include mixins.flex-center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  &__circle-inner {
+    @include mixins.flex-center(column, var(--spacing-xs));
+    width: calc(100% - var(--spacing-xl));
+    height: calc(100% - var(--spacing-xl));
+    border-radius: var(--radius-full);
+    background: var(--bg-cards);
+  }
+
+  &__circle-value {
+    @include mixins.typography(h3);
+    font-weight: var(--font-weight-700);
+  }
+
+  &__circle-label {
+    @include mixins.typography(small, var(--color-neutral-4));
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__details {
+    min-width: 0;
+    @include mixins.flex(column, var(--spacing-lg));
+    justify-content: center;
+  }
+
+  &__suggested {
+    @include mixins.flex(column, var(--spacing-xs));
+  }
+
+  &__suggested-label {
+    margin: 0;
+    @include mixins.typography(small, var(--color-neutral-4));
+  }
+
+  &__suggested-value {
+    margin: 0;
+    @include mixins.typography(h4);
+    font-weight: var(--font-weight-700);
+  }
+
+  &__suggested-hint {
+    margin: 0;
+    @include mixins.typography(small, var(--color-neutral-4));
+  }
+
+  &__breakdown {
+    @include mixins.flex(column, var(--spacing-sm));
+  }
+
+  &__breakdown-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  &__list-heading {
+    margin: 0;
+    @include mixins.typography(h6, var(--color-neutral-4));
+  }
+
+  &__breakdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    @include mixins.flex(column, var(--spacing-md));
+  }
+
+  &__breakdown-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    align-items: center;
+  }
+
+  &__hours {
+    @include mixins.flex(row, var(--spacing-md), space-between, center);
+    @include mixins.typography(paragraph);
+  }
+
+  &__hours-type {
+    color: var(--text);
+  }
+
+  &__hours-value {
+    font-weight: var(--font-weight-600);
+  }
+
+  &__adjust {
+    @include mixins.flex(row, var(--spacing-md), flex-end, center);
+  }
+
+  &__stepper {
+    @include mixins.flex(row, var(--spacing-xs), flex-start, center);
+  }
+
+  &__stepper-button {
+    width: var(--spacing-xl);
+    height: var(--spacing-xl);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--color-neutral-2);
+    color: var(--text);
+    cursor: pointer;
+    @include mixins.flex-center;
+    @include mixins.typography(paragraph);
+    line-height: 1;
+
+    &:focus-visible {
+      outline: var(--border-medium) solid var(--color-primary-base);
+      outline-offset: var(--spacing-xs);
+    }
+  }
+
+  &__stepper-value {
+    min-width: calc(var(--spacing-3xl) + var(--spacing-sm));
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: center;
+    border-radius: var(--radius-md);
+    background: var(--color-neutral-2);
+    @include mixins.typography(paragraph);
+    font-weight: var(--font-weight-600);
+  }
+
+  &__validate-button {
+    display: block;
+
+    .button {
+      justify-content: center;
+    }
+  }
+
+  &__summary-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    @include mixins.flex(column, var(--spacing-sm));
+
+    li {
+      @include mixins.flex(row, var(--spacing-md), space-between, center);
+      @include mixins.typography(paragraph);
+    }
+  }
+}

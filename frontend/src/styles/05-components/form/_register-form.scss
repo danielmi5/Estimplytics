@@ -1,4 +1,5 @@
 @use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
 
 .register {
 	&__content {
@@ -6,10 +7,7 @@
 		min-height: 100dvh;
 		width: 100%;
 
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
+		@include mixins.flex-center(column);
 
 		padding: $spacing-3xl;
 
@@ -28,23 +26,19 @@
 	}
 
 	&__eyebrow {
-		font-family: $font-secondary;
-		font-size: $font-size-xs;
-		font-weight: $font-weight-700;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		color: inherit;
 		margin-bottom: $spacing-sm;
+
+		@include mixins.typography(mini, inherit);
+
+		font-weight: var(--font-weight-700);
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
 	}
 
 	&__title {
 		margin-bottom: $spacing-sm;
 
-		font-family: $font-primary;
-		font-size: $font-size-3xl;
-		font-weight: $font-weight-700;
-		line-height: $line-height-tight;
-		color: inherit;
+		@include mixins.typography(h3, inherit);
 	}
 
 	&__title--content {
@@ -52,11 +46,9 @@
 	}
 
 	&__subtitle {
-		font-family: $font-secondary;
-		font-size: $font-size-base;
-		color: inherit;
-		font-weight: $font-weight-400;
 		max-width: 44ch;
+
+		@include mixins.typography(paragraph, inherit);
 	}
 
 	&__footer {
@@ -66,10 +58,9 @@
 	}
 
 	&__login {
+		@include mixins.typography(small, var(--card-label));
+
 		text-align: center;
-		font-family: $font-secondary;
-		font-size: $font-size-sm;
-		color: var(--card-label);
 	}
 }
 
@@ -87,18 +78,18 @@
 
 	&__error {
 		display: block;
-		font-family: $font-secondary;
-		font-size: $font-size-xs;
-		color: var(--color-error);
 		margin-top: $spacing-sm;
-		font-weight: $font-weight-500;
+
+		@include mixins.typography(mini, var(--color-error));
+
+		font-weight: var(--font-weight-500);
 	}
 }
 
 .link {
 	color: var(--link-form);
-	text-decoration: none;
 	font-weight: $font-weight-600;
+	text-decoration: none;
 	transition: color var(--transition-fast) ease;
 
 	&:hover,

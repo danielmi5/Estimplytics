@@ -1,3 +1,4 @@
+@use "../../00-settings/variables" as *;
 @use "../../01-tools/mixins" as mixins;
 
 .button {
@@ -7,28 +8,31 @@
 	gap: var(--spacing-xs);
 	padding: var(--spacing-md) var(--spacing-lg);
 	border-radius: var(--radius-md);
-	font-size: var(--font-size-base);
+	@include mixins.typography(paragraph);
 	font-weight: var(--font-weight-700);
+	line-height: var(--line-height-normal);
 	text-decoration: none;
 	border: 1px solid transparent;
 	cursor: pointer;
 
 	&--sm {
 		padding: var(--spacing-xs) var(--spacing-md);
-		font-size: var(--font-size-sm);
+		@include mixins.typography(small);
 		font-weight: var(--font-weight-600);
 	}
 
 	&--md {
 		padding: var(--spacing-md) var(--spacing-lg);
-		font-size: var(--font-size-base);
+		@include mixins.typography(paragraph);
 		font-weight: var(--font-weight-700);
+		line-height: var(--line-height-normal);
 	}
 
 	&--lg {
 		padding: var(--spacing-lg) var(--spacing-xl);
-		font-size: var(--font-size-lg);
+		@include mixins.typography(button);
 		font-weight: var(--font-weight-700);
+		line-height: var(--line-height-normal);
 	}
 
 	&--full-width {
@@ -36,61 +40,45 @@
 	}
 
 	&--primary {
-		background: var(--button-primary-default);
-		border-color: var(--button-primary-default);
-		color: var(--text-dark);
+		background: $button-primary-default;
+		border-color: $button-primary-default;
+		color: $text-dark;
 
 		cursor: pointer;
 		transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease;
 
 		&:hover {
-			background: var(--button-primary-hover);
-			border-color: var(--button-primary-hover);
+			background: $button-primary-hover;
+			border-color: $button-primary-hover;
 		}
 
 		&:active {
-			background: var(--button-primary-clicked);
-			border-color: var(--button-primary-clicked);
+			background: $button-primary-clicked;
+			border-color: $button-primary-clicked;
 		}
 	}
 
 	&--secondary {
-		background: var(--button-secondary-default);
-		border-color: var(--border-button-secondary);
-		color: var(--text-important);
+		background: $button-secondary-default;
+		border-color: $border-button-secondary-light;
+		color: $text-important-light;
 
 		cursor: pointer;
 		transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease;
 
 		&:hover {
-			background: var(--button-secondary-hover);
+			background: $button-secondary-hover;
 		}
 
 		&:active {
-			background: var(--button-secondary-clicked);
-		}
-	}
-
-	&--light {
-		background: var(--button-secondary-default);
-		color: var(--text-important);
-
-		cursor: pointer;
-		transition: background var(--transition-fast) ease;
-
-		&:hover {
-			background: var(--button-secondary-hover);
-		}
-
-		&:active {
-			background: var(--button-secondary-clicked);
+			background: $button-secondary-clicked;
 		}
 	}
 
 	&--ghost {
-		background: var(--button-secondary-default);
-		border-color: var(--border-button);
-		color: var(--text-dark);
+		background: $button-secondary-default;
+		border-color: $border-button-light;
+		color: $text-dark;
 		@include mixins.disabled();
 	}
 }

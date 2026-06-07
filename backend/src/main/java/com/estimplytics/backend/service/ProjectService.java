@@ -22,18 +22,21 @@ public class ProjectService implements IProjectService {
     private final ProjectRepository projectRepository;
     private final RequestRepository requestRepository;
     private final ProjectMapper projectMapper;
+    private final OwnershipService ownershipService;
 
-    public ProjectService(ProjectRepository projectRepository,
-                          RequestRepository requestRepository,
-                          ProjectMapper projectMapper) {
+    public ProjectService(ProjectRepository projectRepository, RequestRepository requestRepository, ProjectMapper projectMapper, OwnershipService ownershipService) {
         this.projectRepository = projectRepository;
         this.requestRepository = requestRepository;
         this.projectMapper = projectMapper;
+        this.ownershipService = ownershipService;
     }
 
     @Override
     public Page<ProjectResponseDTO> findAll(Pageable pageable) {
-        return projectRepository.findAll(pageable).map(projectMapper::toResponseDTO);
+        if (ownershipService.isAdmin()) {
+            return projectRepository.findAll(pageable).map(projectMapper::toResponseDTO);
+        }
+        return projectRepository.findByOwnerOrOwnerIsNull(ownershipService.currentUser(), pageable).map(projectMapper::toResponseDTO);
     }
 
     @Override
@@ -45,14 +48,15 @@ public class ProjectService implements IProjectService {
     @Transactional
     public ProjectResponseDTO create(ProjectRequestDTO dto) {
         Project entity = projectMapper.toEntity(dto);
-        Project savedEntity = projectRepository.save(entity);
-        return projectMapper.toResponseDTO(savedEntity);
+        if (!ownershipService.isAdmin()) entity.setOwner(ownershipService.currentUser());
+        return projectMapper.toResponseDTO(projectRepository.save(entity));
     }
 
     @Override
     @Transactional
     public ProjectResponseDTO update(UUID id, ProjectUpdateDTO dto) {
         return projectRepository.findById(id).map(entity -> {
+            ownershipService.requireProjectOwner(entity);
             projectMapper.updateEntityFromDTO(dto, entity);
             return projectMapper.toResponseDTO(projectRepository.save(entity));
         }).orElseThrow(() -> new ProjectNotFoundException("Project not found with id %s".formatted(id)));
@@ -61,12 +65,11 @@ public class ProjectService implements IProjectService {
     @Override
     @Transactional
     public void delete(UUID id) {
-        if (!projectRepository.existsById(id)) {
-            throw new ProjectNotFoundException("Project not found with id %s".formatted(id));
-        }
+        Project project = projectRepository.findById(id).orElseThrow(() -> new ProjectNotFoundException("Project not found with id %s".formatted(id)));
+        ownershipService.requireProjectOwner(project);
         if (requestRepository.existsByProjectId(id)) {
             throw new IllegalArgumentException("Cannot delete project with associated manual requests");
         }
-        projectRepository.deleteById(id);
+        projectRepository.delete(project);
     }
 }

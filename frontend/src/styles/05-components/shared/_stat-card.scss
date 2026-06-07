@@ -18,9 +18,7 @@
         }
 
         strong {
-            color: var(--text);
-            font-family: var(--font-secondary);
-            font-size: var(--font-size-lg);
+            @include mixins.typography(h6);
         }
     }
 
@@ -40,48 +38,5 @@
 
             transition: width 900ms ease;
         }
-    }
-}
-
-.summary-card {
-    padding: var(--spacing-lg);
-
-    @include mixins.flex(row, var(--spacing-md), flex-start, center);
-
-    border-radius: 1.2rem;
-    background: var(--bg-cards);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-
-    &__icon {
-        flex-shrink: 0;
-        @include mixins.flex-center();
-
-        &--success {
-            color: var(--color-success);
-        }
-
-        &--info {
-            color: var(--text-important);
-        }
-
-        &--warning {
-            color: var(--color-warning);
-        }
-    }
-
-    strong {
-        display: block;
-
-        color: var(--text);
-
-        font-family: var(--font-secondary);
-        font-size: var(--font-size-xl);
-        font-weight: var(--font-weight-700);
-    }
-
-    span {
-        color: var(--card-label);
-        font-size: var(--font-size-sm);
     }
 }

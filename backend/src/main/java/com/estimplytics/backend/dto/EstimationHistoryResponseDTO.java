@@ -21,7 +21,7 @@ public class EstimationHistoryResponseDTO {
     private UUID estimationId;
     @Schema(description = "Frozen version", example = "1")
     private Integer frozenVersion;
-    @Schema(description = "Historical estimation data", example = "{\"hoursAn\":10,\"hoursAs\":20}")
+    @Schema(description = "Historical estimation data", example = "{\"hoursPlanning\":5,\"hoursAnalysis\":10,\"hoursDevelopment\":20,\"hoursTesting\":8}")
     private Map<String, Object> snapshotData;
     @Schema(description = "Modification date and time", example = "2026-05-08T08:30:00")
     private LocalDateTime modifiedAt;

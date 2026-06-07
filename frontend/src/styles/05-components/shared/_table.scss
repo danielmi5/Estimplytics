@@ -1,0 +1,99 @@
+@use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    &__wrap {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 1.35rem;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    thead {
+        background: var(--bg-cards);
+    }
+
+    th {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-bottom: 1px solid var(--border);
+        @include mixins.typography(mini, var(--card-label));
+        font-weight: var(--font-weight-700);
+        letter-spacing: 0.07em;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    td {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+        font-size: var(--font-size-sm);
+        text-align: center;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover td {
+        background: var(--bg-cards);
+    }
+
+    &__ticket {
+        @include mixins.typography(h6, var(--text-important));
+        font-size: inherit;
+    }
+
+    &__cell-title {
+        max-width: 22rem;
+        color: var(--text);
+        font-weight: var(--font-weight-500);
+    }
+
+    &__project {
+        display: inline-flex;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-full);
+        background: var(--bg);
+        @include mixins.typography(mini, var(--card-label));
+        font-weight: var(--font-weight-600);
+    }
+
+    &__date {
+        color: var(--card-label);
+    }
+
+    &__demand {
+        @include mixins.typography(mini);
+        font-weight: var(--font-weight-700);
+
+        &--feature {
+            color: var(--color-category-2);
+        }
+
+        &--bug {
+            color: var(--color-category-4);
+        }
+
+        &--support {
+            color: var(--color-category-3);
+        }
+
+        &--default {
+            color: var(--color-category-1);
+        }
+    }
+
+    @media (max-width: $breakpoint-md) {
+        &__wrap {
+            border-radius: 1rem;
+        }
+
+        min-width: 44rem;
+    }
+}

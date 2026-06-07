@@ -95,6 +95,18 @@ class ComponentAnalysisControllerTest {
     }
 
     @Test
+    void getByAnalysisId_shouldReturnOk() {
+        UUID analysisId = UUID.randomUUID();
+        ComponentAnalysisResponseDTO dto = mock(ComponentAnalysisResponseDTO.class);
+        when(service.findByAnalysisId(analysisId)).thenReturn(List.of(dto));
+
+        ResponseEntity<List<ComponentAnalysisResponseDTO>> response = controller.getByAnalysisId(analysisId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsExactly(dto);
+    }
+
+    @Test
     void delete_shouldReturnNoContent() {
         UUID id = UUID.randomUUID();
 

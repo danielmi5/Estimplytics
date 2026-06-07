@@ -14,5 +14,5 @@ public interface IRedmineIntegrationController {
     @ApiResponse(responseCode = "404", description = "Redmine credential not found")
     @ApiResponse(responseCode = "502", description = "Error communicating with Redmine or processing data")
     @PostMapping("/sync")
-    ResponseEntity<String> syncIssues(@RequestParam("credentialId") Long credentialId);
+    ResponseEntity<String> syncIssues(@RequestParam("credentialId") Long credentialId, @RequestParam(value = "fullSync", defaultValue = "false") boolean fullSync);
 }

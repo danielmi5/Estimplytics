@@ -15,6 +15,7 @@ export class RequestsApiService {
     if (params?.page !== undefined) httpParams = httpParams.set('page', params.page);
     if (params?.size !== undefined) httpParams = httpParams.set('size', params.size);
     if (params?.sort) httpParams = httpParams.set('sort', params.sort);
+    if (params?.search) httpParams = httpParams.set('search', params.search);
     return this.http.get<Page<RequestResponse>>(this.baseUrl, { params: httpParams });
   }
 
@@ -32,5 +33,13 @@ export class RequestsApiService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  lock(id: string): Observable<RequestResponse> {
+    return this.http.post<RequestResponse>(`${this.baseUrl}/${id}/lock`, null);
+  }
+
+  unlock(id: string): Observable<RequestResponse> {
+    return this.http.post<RequestResponse>(`${this.baseUrl}/${id}/unlock`, null);
   }
 }

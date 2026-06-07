@@ -54,18 +54,16 @@
         h3 {
             margin: 0 0 var(--spacing-xs);
 
-            color: var(--text);
+            @include mixins.typography(paragraph);
 
-            font-size: var(--font-size-base);
             font-weight: var(--font-weight-600);
         }
 
         p {
             margin: 0 0 var(--spacing-sm);
 
-            color: var(--card-label);
+            @include mixins.typography(small, var(--card-label));
 
-            font-size: var(--font-size-sm);
             line-height: var(--line-height-relaxed);
         }
     }
@@ -73,9 +71,8 @@
     &__meta {
         @include mixins.flex(row, var(--spacing-md), flex-start, center);
 
-        color: var(--card-label);
+        @include mixins.typography(mini, var(--card-label));
 
-        font-size: var(--font-size-xs);
         font-weight: var(--font-weight-600);
     }
 

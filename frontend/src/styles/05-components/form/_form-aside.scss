@@ -1,59 +1,47 @@
 @use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
 
 .form-aside {
 	flex: 1;
 	width: 100%;
 
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	@include mixins.flex-center();
 
 	padding: $spacing-3xl;
 
 	background: linear-gradient(135deg, var(--card-important) 0%, var(--text-important) 100%);
-	color: var(--text-dark);
+	color: $text-dark;
 
 	@media (max-width: $breakpoint-lg) {
 		min-height: 0;
 	}
 
 	&__content {
-		max-width: 420px;
 		width: 100%;
+		max-width: 420px;
 
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		justify-content: center;
+		@include mixins.flex(column, 0, center, flex-start);
 	}
 
 	&__eyebrow {
 		margin-bottom: $spacing-sm;
 
-		font-family: $font-secondary;
-		font-size: $font-size-xs;
-		font-weight: $font-weight-700;
+		@include mixins.typography(mini, inherit);
+
+		font-weight: var(--font-weight-700);
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
-		color: inherit;
 	}
 
 	&__title {
 		margin-bottom: $spacing-sm;
 
-		font-family: $font-primary;
-		font-size: $font-size-3xl;
-		font-weight: $font-weight-700;
-		line-height: $line-height-tight;
-		color: inherit;
+		@include mixins.typography(h3, inherit);
 	}
 
 	&__subtitle {
 		max-width: 44ch;
 
-		font-family: $font-secondary;
-		font-size: $font-size-base;
-		font-weight: $font-weight-400;
-		color: inherit;
+		@include mixins.typography(paragraph, inherit);
 	}
 }

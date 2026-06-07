@@ -29,29 +29,29 @@ class RedmineIntegrationControllerTest {
 
     @Test
     void syncIssues_whenSuccessful_shouldReturnOkWithCount() {
-        when(service.syncIssuesFromRedmine(1L)).thenReturn(5);
+        when(service.syncIssuesFromRedmine(1L, false)).thenReturn(5);
 
-        ResponseEntity<String> response = controller.syncIssues(1L);
+        ResponseEntity<String> response = controller.syncIssues(1L, false);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Synchronization successful. 5 records synchronized.", response.getBody());
+        assertEquals("5", response.getBody());
     }
 
     @Test
     void syncIssues_whenNoRecordsSynced_shouldReturnOkWithZero() {
-        when(service.syncIssuesFromRedmine(1L)).thenReturn(0);
+        when(service.syncIssuesFromRedmine(1L, false)).thenReturn(0);
 
-        ResponseEntity<String> response = controller.syncIssues(1L);
+        ResponseEntity<String> response = controller.syncIssues(1L, false);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Synchronization successful. 0 records synchronized.", response.getBody());
+        assertEquals("0", response.getBody());
     }
 
     @Test
     void syncIssues_whenExceptionThrown_shouldPropagateException() {
-        when(service.syncIssuesFromRedmine(1L))
+        when(service.syncIssuesFromRedmine(1L, false))
                 .thenThrow(new RedmineIntegrationException("Connection timeout", new RuntimeException(), RedmineIntegrationException.ErrorType.NETWORK_ERROR));
 
-        assertThrows(RedmineIntegrationException.class, () -> controller.syncIssues(1L));
+        assertThrows(RedmineIntegrationException.class, () -> controller.syncIssues(1L, false));
     }
 }

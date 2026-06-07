@@ -10,22 +10,12 @@ describe('Activity', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Activity],
-      providers: [provideRouter([])]
-    })
-    .compileComponents();
+      providers: [provideRouter([])],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Activity);
-    fixture.componentRef.setInput('activities', [
-      {
-        id: 'act-1',
-        type: 'analysis',
-        title: 'Análisis inicial',
-        description: 'Validación de impacto',
-        user: 'Copilot',
-        time: 'hace 1 min'
-      }
-    ]);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('activities', []);
     fixture.detectChanges();
   });
 

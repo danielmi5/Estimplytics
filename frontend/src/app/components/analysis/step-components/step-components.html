@@ -1,0 +1,106 @@
+<div class="step-section">
+  <article
+    class="step-card"
+    [class.step-card--completed]="state() === 'completed'"
+    [class.step-card--active]="state() === 'active'"
+    [class.step-card--inactive]="state() === 'inactive'"
+  >
+    @if (state() !== 'completed') {
+      <header class="step-card__header">
+        <span
+          class="step-card__badge"
+          [class.step-card__badge--success]="state() === 'completed'"
+          [class.step-card__badge--active]="state() === 'active'"
+          [class.step-card__badge--inactive]="state() === 'inactive'"
+          aria-hidden="true"
+        >2</span>
+        <h2 class="step-card__title">Componentes Arquitectónicos</h2>
+      </header>
+    }
+
+    @if (state() === 'active') {
+      <div class="step-card__body step-components">
+        <div class="step-components__layout">
+          <div class="step-components__tree" aria-label="Árbol de componentes">
+            @if (isLoading()) {
+              <p class="step-components__empty">Cargando componentes...</p>
+            } @else if (tree().length === 0) {
+              <p class="step-components__empty">No hay componentes disponibles.</p>
+            } @else {
+              <ul class="step-components__tree-root">
+                @for (category of tree(); track category.id) {
+                  <li class="step-components__category">
+                    <h3 class="step-components__panel-title">{{ category.label }}</h3>
+                    <ul class="step-components__children">
+                      @for (component of category.children; track component.id) {
+                        <li class="step-components__leaf">
+                          <app-form-checkbox
+                            [id]="'component-' + component.id"
+                            [name]="'component-' + component.id"
+                            [checked]="isSelected(component.id)"
+                            (checkedChange)="setComponentSelected(component.id, $event)"
+                          >
+                            {{ component.name }}
+                          </app-form-checkbox>
+                        </li>
+                      }
+                    </ul>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <aside class="step-components__tags" aria-label="Componentes seleccionados">
+            <h3 class="step-components__panel-title">Seleccionados</h3>
+            @if (selectedTags().length === 0) {
+              <p class="step-components__empty">Ningún componente seleccionado.</p>
+            } @else {
+              <ul class="step-components__tag-list">
+                @for (tag of selectedTags(); track tag.id) {
+                  <li class="step-components__tag">
+                    <span>{{ tag.name }}</span>
+                    <button
+                      type="button"
+                      class="step-components__tag-remove"
+                      [attr.aria-label]="'Quitar ' + tag.name"
+                      (click)="removeTag(tag.id)"
+                    >×</button>
+                  </li>
+                }
+              </ul>
+            }
+          </aside>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="step-components__empty step-components__error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <div class="step-card__actions">
+          <app-button
+            variant="primary"
+            label="Continuar a estimación"
+            buttonType="button"
+            [disabled]="selectedIds().length === 0"
+            (pressed)="continue()"
+          />
+        </div>
+      </div>
+    }
+
+    @if (state() === 'completed') {
+      <header class="step-card__header step-card__header--completed">
+        <span class="step-card__badge step-card__badge--success" aria-hidden="true">
+          <span [feather]="'check'"></span>
+        </span>
+        <h2 class="step-card__title">Paso 2: Componentes Arquitectónicos</h2>
+        <button type="button" class="step-card__edit" aria-label="Editar paso 2" (click)="onEdit()">
+          <span [feather]="'edit-2'" variant="botones"></span>
+        </button>
+      </header>
+
+      <p class="step-card__summary-text">{{ completedSummary() }}</p>
+    }
+  </article>
+</div>

@@ -60,7 +60,7 @@ public class SecurityIntegrationTest {
         loginRequest.setEmail(email);
         loginRequest.setPassword(password);
 
-        MvcResult result = mockMvc.perform(post("/api/auth/token")
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isOk())
@@ -92,7 +92,7 @@ public class SecurityIntegrationTest {
         loginRequest.setEmail("invalidemail");
         loginRequest.setPassword("");
 
-        mockMvc.perform(post("/api/auth/token")
+        mockMvc.perform(post("/api/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isBadRequest());
@@ -106,20 +106,20 @@ public class SecurityIntegrationTest {
         loginRequest.setEmail("analyst@estymplytics.es");
         loginRequest.setPassword("wrong-password");
 
-        mockMvc.perform(post("/api/auth/token")
+        mockMvc.perform(post("/api/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void analyst_CanGetRequests_ButNotDelete() throws Exception {
+    public void analyst_CanGetRequests_ButNotAccessAdminEndpoints() throws Exception {
         createTestUser(Role.ANALYST);
         String token = loginAndGetToken("analyst@estymplytics.es", "Zx23edfzTF");
 
         mockMvc.perform(get("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/components").header("Authorization", "Bearer " + token)).andExpect(status().isForbidden());
     }
 
     @Test
@@ -137,9 +137,9 @@ public class SecurityIntegrationTest {
 
         mockMvc.perform(get("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/auth/logout").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+        mockMvc.perform(post("/api/auth/logout").header("Authorization", "Bearer " + token)).andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/requests").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
     }
 }
 

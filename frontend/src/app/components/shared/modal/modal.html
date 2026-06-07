@@ -1,0 +1,43 @@
+@if (open()) {
+  <section class="modal" (click)="close()">
+    <div class="modal__backdrop" aria-hidden="true"></div>
+
+    <div
+      class="modal__panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="titleId"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="modal__header">
+        <h2 class="modal__title" [id]="titleId">{{ title() }}</h2>
+        <button type="button" class="modal__close" aria-label="Cerrar" (click)="close()">
+          <span [feather]="'x'" [variant]="'botones'" aria-hidden="true"></span>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <ng-content />
+      </div>
+
+      <footer class="modal__footer">
+        <app-button
+          variant="secondary"
+          [label]="secondaryLabel()"
+          buttonType="button"
+          size="md"
+          [disabled]="disabled()"
+          (pressed)="secondaryAction.emit()"
+        />
+        <app-button
+          variant="primary"
+          [label]="primaryLabel()"
+          buttonType="button"
+          size="md"
+          [disabled]="disabled()"
+          (pressed)="primaryAction.emit()"
+        />
+      </footer>
+    </div>
+  </section>
+}

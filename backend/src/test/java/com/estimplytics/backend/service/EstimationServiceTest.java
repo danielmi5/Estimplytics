@@ -5,9 +5,13 @@ import com.estimplytics.backend.dto.EstimationResponseDTO;
 import com.estimplytics.backend.dto.EstimationUpdateDTO;
 import com.estimplytics.backend.dto.EstimationAlgorithmResultDTO;
 import com.estimplytics.backend.entity.Estimation;
+import com.estimplytics.backend.entity.ImpactAnalysis;
+import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.exception.EstimationNotFoundException;
 import com.estimplytics.backend.mapper.EstimationMapper;
 import com.estimplytics.backend.repository.EstimationRepository;
+import com.estimplytics.backend.repository.ImpactAnalysisRepository;
+import com.estimplytics.backend.repository.RequestRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,8 +28,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +43,18 @@ class EstimationServiceTest {
 
     @Mock
     private EstimationAlgorithmService estimationAlgorithmService;
+
+    @Mock
+    private ExcelGeneratorService excelGeneratorService;
+
+    @Mock
+    private ImpactAnalysisRepository impactAnalysisRepository;
+
+    @Mock
+    private RequestRepository requestRepository;
+
+    @Mock
+    private OwnershipService ownershipService;
 
     @InjectMocks
     private EstimationService service;
@@ -72,31 +88,56 @@ class EstimationServiceTest {
 
     @Test
     void create_shouldPersistAndMapEntity() {
-        EstimationRequestDTO request = mock(EstimationRequestDTO.class);
+        UUID analysisId = UUID.randomUUID();
+        UUID requestId = UUID.randomUUID();
+        ImpactAnalysis analysis = mock(ImpactAnalysis.class);
+        Request request = mock(Request.class);
+        Request managedRequest = mock(Request.class);
+        EstimationRequestDTO requestDto = mock(EstimationRequestDTO.class);
         Estimation entity = mock(Estimation.class);
         Estimation saved = mock(Estimation.class);
         EstimationResponseDTO response = mock(EstimationResponseDTO.class);
-        UUID analysisId = UUID.randomUUID();
-        when(request.getAnalysisId()).thenReturn(analysisId);
-        EstimationAlgorithmResultDTO algorithmResult = EstimationAlgorithmResultDTO.builder().suggestedTotalHours(20).fiabilityPercentage(80).build();
+        when(requestDto.getAnalysisId()).thenReturn(analysisId);
+        EstimationAlgorithmResultDTO algorithmResult = EstimationAlgorithmResultDTO.builder()
+                .suggestedTotalHours(20)
+                .fiabilityPercentage(80)
+                .build();
         when(estimationAlgorithmService.calculateSuggestionForAnalysisId(analysisId)).thenReturn(algorithmResult);
-        when(mapper.toEntity(request)).thenReturn(entity);
+        when(mapper.toEntity(requestDto)).thenReturn(entity);
+        when(entity.getAnalysis()).thenReturn(analysis);
+        when(analysis.getId()).thenReturn(analysisId);
+        when(impactAnalysisRepository.findById(analysisId)).thenReturn(Optional.of(analysis));
+        when(analysis.getRequest()).thenReturn(request);
+        when(request.getId()).thenReturn(requestId);
+        when(requestRepository.findById(requestId)).thenReturn(Optional.of(managedRequest));
         when(repository.save(entity)).thenReturn(saved);
         when(mapper.toResponseDTO(saved)).thenReturn(response);
 
-        EstimationResponseDTO result = service.create(request);
+        EstimationResponseDTO result = service.create(requestDto);
 
         assertThat(result).isSameAs(response);
+        verify(ownershipService).requireEditAndRenew(managedRequest);
     }
 
     @Test
     void update_shouldPersistAndMapWhenEntityExists() {
         UUID id = UUID.randomUUID();
+        UUID analysisId = UUID.randomUUID();
+        UUID requestId = UUID.randomUUID();
+        ImpactAnalysis analysis = mock(ImpactAnalysis.class);
+        Request request = mock(Request.class);
+        Request managedRequest = mock(Request.class);
         EstimationUpdateDTO update = mock(EstimationUpdateDTO.class);
         Estimation entity = mock(Estimation.class);
         Estimation saved = mock(Estimation.class);
         EstimationResponseDTO response = mock(EstimationResponseDTO.class);
         when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(entity.getAnalysis()).thenReturn(analysis);
+        when(analysis.getId()).thenReturn(analysisId);
+        when(impactAnalysisRepository.findById(analysisId)).thenReturn(Optional.of(analysis));
+        when(analysis.getRequest()).thenReturn(request);
+        when(request.getId()).thenReturn(requestId);
+        when(requestRepository.findById(requestId)).thenReturn(Optional.of(managedRequest));
         when(repository.save(entity)).thenReturn(saved);
         when(mapper.toResponseDTO(saved)).thenReturn(response);
 
@@ -131,5 +172,18 @@ class EstimationServiceTest {
         when(repository.existsById(id)).thenReturn(false);
 
         assertThatThrownBy(() -> service.delete(id)).isInstanceOf(EstimationNotFoundException.class);
+    }
+
+    @Test
+    void findByAnalysisId_shouldMapWhenEntityExists() {
+        UUID analysisId = UUID.randomUUID();
+        Estimation entity = mock(Estimation.class);
+        EstimationResponseDTO response = mock(EstimationResponseDTO.class);
+        when(repository.findByAnalysis_Id(analysisId)).thenReturn(Optional.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(response);
+
+        Optional<EstimationResponseDTO> result = service.findByAnalysisId(analysisId);
+
+        assertThat(result).contains(response);
     }
 }

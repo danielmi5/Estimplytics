@@ -1,44 +1,69 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { PageParams } from '../dtos/pagination.dto';
+import { NotificationService } from '../../services/notification.service';
 import { RequestRequest, RequestResponse, RequestUpdate } from './request.dto';
 import { RequestsApiService } from './requests-api.service';
 
 @Injectable()
 export class RequestsStateService {
   private readonly api = inject(RequestsApiService);
+  private readonly notificationService = inject(NotificationService);
 
   readonly items = signal<RequestResponse[]>([]);
   readonly totalElements = signal<number>(0);
+  readonly totalPages = signal<number>(0);
+  readonly page = signal<number>(0);
+  readonly pageSize = signal<number>(50);
+  readonly search = signal<string>('');
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
+  readonly isCreated = signal(false);
 
   load(params?: PageParams): void {
+    const page = params?.page ?? this.page();
+    const size = params?.size ?? this.pageSize();
+    const search = params?.search ?? this.search();
+
     this.isLoading.set(true);
     this.error.set(null);
-    this.api.getAll(params).subscribe({
-      next: (page) => {
-        this.items.set(page.content);
-        this.totalElements.set(page.totalElements);
+    this.api.getAll({ page, size, search: search || undefined }).subscribe({
+      next: (result) => {
+        this.items.set(result.content);
+        this.totalElements.set(result.totalElements);
+        this.totalPages.set(result.totalPages);
+        this.page.set(result.number);
+        this.pageSize.set(result.size);
+        this.search.set(search);
         this.isLoading.set(false);
       },
       error: (err: unknown) => {
         this.error.set(err instanceof Error ? err.message : 'Error loading requests');
+        this.notificationService.error('No se pudo cargar las peticiones. Inténtalo de nuevo.');
         this.isLoading.set(false);
       }
     });
   }
 
   create(body: RequestRequest): void {
+    this.isCreated.set(false);
     this.isLoading.set(true);
     this.error.set(null);
     this.api.create(body).subscribe({
-      next: (created) => {
-        this.items.update((list) => [...list, created]);
-        this.totalElements.update((n) => n + 1);
-        this.isLoading.set(false);
+      next: () => {
+        this.notificationService.success('Petición creada correctamente.');
+        this.load({ page: this.page(), size: this.pageSize(), search: this.search() || undefined });
+        this.isCreated.set(true);
       },
       error: (err: unknown) => {
         this.error.set(err instanceof Error ? err.message : 'Error creating request');
+        if (err instanceof HttpErrorResponse && err.status === 403) {
+          this.notificationService.error(
+            'No tienes permiso para crear peticiones en este proyecto. Usa un proyecto de tu propiedad.'
+          );
+        } else {
+          this.notificationService.error('No se pudo crear la petición. Inténtalo de nuevo.');
+        }
         this.isLoading.set(false);
       }
     });
@@ -48,9 +73,8 @@ export class RequestsStateService {
     this.isLoading.set(true);
     this.error.set(null);
     this.api.update(id, body).subscribe({
-      next: (updated) => {
-        this.items.update((list) => list.map((r) => (r.id === id ? updated : r)));
-        this.isLoading.set(false);
+      next: () => {
+        this.load({ page: this.page(), size: this.pageSize(), search: this.search() || undefined });
       },
       error: (err: unknown) => {
         this.error.set(err instanceof Error ? err.message : 'Error updating request');
@@ -64,9 +88,7 @@ export class RequestsStateService {
     this.error.set(null);
     this.api.delete(id).subscribe({
       next: () => {
-        this.items.update((list) => list.filter((r) => r.id !== id));
-        this.totalElements.update((n) => n - 1);
-        this.isLoading.set(false);
+        this.load({ page: this.page(), size: this.pageSize(), search: this.search() || undefined });
       },
       error: (err: unknown) => {
         this.error.set(err instanceof Error ? err.message : 'Error deleting request');

@@ -12,8 +12,8 @@ public class RedmineIntegrationController implements IRedmineIntegrationControll
     private final RedmineIntegrationService redmineIntegrationService;
 
     @Override
-    public ResponseEntity<String> syncIssues(Long credentialId) {
-        int syncedCount = redmineIntegrationService.syncIssuesFromRedmine(credentialId);
-        return ResponseEntity.ok("Synchronization successful. %d records synchronized.".formatted(syncedCount));
+    public ResponseEntity<String> syncIssues(Long credentialId, boolean fullSync) {
+        int syncedCount = redmineIntegrationService.syncIssuesFromRedmine(credentialId, fullSync);
+        return ResponseEntity.ok(String.valueOf(syncedCount));
     }
 }

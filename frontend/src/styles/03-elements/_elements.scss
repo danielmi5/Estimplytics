@@ -1,5 +1,5 @@
 body {
-  font-family: var(--font-primary);
+  font-family: var(--font-secondary);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--text);
@@ -14,7 +14,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-secondary);
+  font-family: var(--font-primary);
   line-height: var(--line-height-tight);
   color: var(--text);
 }
@@ -43,13 +43,8 @@ h6 {
   font-size: var(--font-size-lg);
 }
 
-a:not(.button):not([class*="button"]) {
-  color: var(--text-important);
-  text-decoration: none;
-  transition: color var(--transition-fast) ease-in-out;
-}
-
-a:not(.button):not([class*="button"]):hover,
-a:not(.button):not([class*="button"]):focus-visible {
-  color: var(--link-form);
+input,
+textarea,
+select {
+  color: var(--text);
 }

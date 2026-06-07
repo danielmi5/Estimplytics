@@ -60,4 +60,16 @@ public class RequestResponseDTO {
 
     @Schema(description = "Creation date and time", example = "2026-05-08T08:00:00")
     private LocalDateTime createdDate;
+
+    @Schema(description = "Manual request owner identifier")
+    private UUID ownerId;
+
+    @Schema(description = "Analyst holding the edit lock")
+    private UUID analysedById;
+
+    @Schema(description = "Name of the analyst holding the edit lock")
+    private String analysedByName;
+
+    @Schema(description = "Timestamp when the edit lock was taken or renewed")
+    private LocalDateTime analysedAt;
 }

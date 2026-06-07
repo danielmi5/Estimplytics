@@ -1,0 +1,100 @@
+@use '../../01-tools/mixins' as mixins;
+
+.step-files {
+  &__version-badge {
+    @include mixins.flex(row, var(--spacing-xs), flex-start, center);
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: var(--border-thin) solid var(--color-success);
+    border-radius: var(--radius-full);
+    color: var(--color-success);
+    @include mixins.typography(small);
+    line-height: 1;
+  }
+
+  &__downloads {
+    @include mixins.flex(row, var(--spacing-lg), flex-start, stretch);
+    width: 100%;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__download-button {
+    flex: 1;
+    min-width: 0;
+    @include mixins.flex(row, var(--spacing-md), flex-start, center);
+    padding: var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-lg);
+    background: var(--color-neutral-2);
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: background var(--transition-fast) ease;
+
+    &:hover:not(:disabled) {
+      background: var(--bg-subtle-hover);
+    }
+
+    &:focus-visible {
+      outline: var(--border-medium) solid var(--color-primary-base);
+      outline-offset: var(--spacing-xs);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__download-icon {
+    @include mixins.flex-center;
+    flex-shrink: 0;
+    width: calc(var(--spacing-xl) + var(--spacing-sm));
+    height: calc(var(--spacing-xl) + var(--spacing-sm));
+    border-radius: var(--radius-md);
+    color: var(--surface-on-accent);
+
+    .feather-icon svg {
+      stroke: currentColor;
+    }
+
+    &--analysis {
+      background: var(--color-primary-base);
+    }
+
+    &--planning {
+      background: var(--color-success);
+    }
+  }
+
+  &__download-content {
+    flex: 1;
+    min-width: 0;
+    @include mixins.flex(column, var(--spacing-xs));
+  }
+
+  &__download-title {
+    margin: 0;
+    @include mixins.typography(h6);
+    font-weight: var(--font-weight-600);
+  }
+
+  &__download-description {
+    margin: 0;
+    @include mixins.typography(small, var(--color-neutral-4));
+  }
+
+  &__download-action {
+    @include mixins.flex-center;
+    flex-shrink: 0;
+    color: var(--text);
+
+    .feather-icon svg {
+      stroke: currentColor;
+    }
+  }
+}

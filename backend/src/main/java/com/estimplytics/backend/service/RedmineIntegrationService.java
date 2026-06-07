@@ -2,54 +2,68 @@ package com.estimplytics.backend.service;
 
 import com.estimplytics.backend.dto.redmine.RedmineIssueDTO;
 import com.estimplytics.backend.dto.redmine.RedmineIssueResponseDTO;
-import com.estimplytics.backend.entity.RedmineIssueMetadata;
-import com.estimplytics.backend.entity.Request;
 import com.estimplytics.backend.entity.UserRedmineCredential;
 import com.estimplytics.backend.exception.RedmineCredentialNotFoundException;
 import com.estimplytics.backend.exception.RedmineIntegrationException;
 import com.estimplytics.backend.exception.RedmineIntegrationException.ErrorType;
-import com.estimplytics.backend.mapper.RedmineIssueMapper;
-import com.estimplytics.backend.repository.RedmineIssueMetadataRepository;
-import com.estimplytics.backend.repository.RequestRepository;
 import com.estimplytics.backend.repository.UserRedmineCredentialRepository;
 import com.estimplytics.backend.util.RedmineDateFormatter;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RedmineIntegrationService {
 
     private final RestClient restClient;
-    private final RequestRepository requestRepository;
-    private final RedmineIssueMetadataRepository redmineIssueMetadataRepository;
     private final UserRedmineCredentialRepository userRedmineCredentialRepository;
-    private final RedmineIssueMapper redmineIssueMapper;
+    private final RedmineIssuePersistenceService redmineIssuePersistenceService;
+    private final OwnershipService ownershipService;
 
-    public RedmineIntegrationService(RestClient.Builder restClientBuilder,
-                                     RequestRepository requestRepository,
-                                     RedmineIssueMetadataRepository redmineIssueMetadataRepository,
-                                     UserRedmineCredentialRepository userRedmineCredentialRepository,
-                                     RedmineIssueMapper redmineIssueMapper) {
+    public RedmineIntegrationService(RestClient.Builder restClientBuilder, UserRedmineCredentialRepository userRedmineCredentialRepository, RedmineIssuePersistenceService redmineIssuePersistenceService, OwnershipService ownershipService) {
         this.restClient = restClientBuilder.build();
-        this.requestRepository = requestRepository;
-        this.redmineIssueMetadataRepository = redmineIssueMetadataRepository;
         this.userRedmineCredentialRepository = userRedmineCredentialRepository;
-        this.redmineIssueMapper = redmineIssueMapper;
+        this.redmineIssuePersistenceService = redmineIssuePersistenceService;
+        this.ownershipService = ownershipService;
     }
 
-    @Transactional
-    public int syncIssuesFromRedmine(Long credentialId) {
-        UserRedmineCredential credential = userRedmineCredentialRepository.findById(credentialId)
-                .orElseThrow(() -> new RedmineCredentialNotFoundException(
-                        "Redmine credential not found with id %s".formatted(credentialId)));
+    public String resolveBaseUrl(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return baseUrl;
+        }
+        String url = baseUrl.trim().replaceAll("/+$", "");
+        if (url.equalsIgnoreCase("http://redmine.org") || url.equalsIgnoreCase("https://redmine.org")) {
+            return "https://www.redmine.org";
+        }
+        return url;
+    }
+
+    public String testConnection(UserRedmineCredential credential) {
+        String base = resolveBaseUrl(credential.getRedmineInstance().getBaseUrl());
+        try {
+            applyApiKey(restClient.get().uri(base + "/issues.json?limit=1"), credential.getApiKey())
+                    .retrieve()
+                    .body(RedmineIssueResponseDTO.class);
+            return "connected";
+        } catch (HttpClientErrorException e) {
+            int code = e.getStatusCode().value();
+            return (code == 401 || code == 403) ? "unauthorized" : "unreachable";
+        } catch (Exception e) {
+            return "unreachable";
+        }
+    }
+
+    public int syncIssuesFromRedmine(Long credentialId, boolean fullSync) {
+        UserRedmineCredential credential = userRedmineCredentialRepository.findById(credentialId).orElseThrow(() -> new RedmineCredentialNotFoundException("Redmine credential not found with id %s".formatted(credentialId)));
+        ownershipService.requireUserOrAdmin(credential.getUser().getId());
+
+        if (fullSync) {
+            credential.setLastSyncAt(null);
+        }
 
         int offset = 0;
         int limit = 100;
@@ -57,19 +71,16 @@ public class RedmineIntegrationService {
         Integer totalCount = null;
 
         try {
-            do {
-                String apiUrl = "%s/issues.json?status_id=*&limit=%d&offset=%d".formatted(
-                        credential.getRedmineInstance().getBaseUrl(), limit, offset);
+            String baseUrl = resolveBaseUrl(credential.getRedmineInstance().getBaseUrl());
 
-                if (credential.getLastSyncAt() != null) {
+            do {
+                String apiUrl = "%s/issues.json?status_id=*&limit=%d&offset=%d".formatted(baseUrl, limit, offset);
+
+                if (!fullSync && credential.getLastSyncAt() != null) {
                     apiUrl += "&updated_on=>=" + RedmineDateFormatter.formatUpdatedOnFilter(credential.getLastSyncAt());
                 }
 
-                RedmineIssueResponseDTO response = restClient.get()
-                        .uri(apiUrl)
-                        .header("X-Redmine-API-Key", credential.getApiKey())
-                        .retrieve()
-                        .body(RedmineIssueResponseDTO.class);
+                RedmineIssueResponseDTO response = applyApiKey(restClient.get().uri(apiUrl), credential.getApiKey()).retrieve().body(RedmineIssueResponseDTO.class);
 
                 if (response == null || response.getIssues() == null || response.getIssues().isEmpty()) {
                     break;
@@ -80,8 +91,12 @@ public class RedmineIntegrationService {
                 }
 
                 for (RedmineIssueDTO issueDto : response.getIssues()) {
-                    upsertIssue(issueDto, credential);
-                    totalSynced++;
+                    try {
+                        redmineIssuePersistenceService.upsertIssue(issueDto, credential);
+                        totalSynced++;
+                    } catch (Exception e) {
+                        System.err.println("Error sincronizando ticket " + issueDto.getId() + ": " + e.getMessage());
+                    }
                 }
 
                 offset += limit;
@@ -108,26 +123,10 @@ public class RedmineIntegrationService {
         }
     }
 
-    private void upsertIssue(RedmineIssueDTO dto, UserRedmineCredential credential) {
-        Optional<RedmineIssueMetadata> existingMetadata = redmineIssueMetadataRepository
-                .findByRedmineIdAndRedmineInstanceId(dto.getId(), credential.getRedmineInstance().getId());
-
-        Request request;
-        RedmineIssueMetadata metadata;
-
-        if (existingMetadata.isPresent()) {
-            metadata = existingMetadata.get();
-            request = metadata.getRequest();
-        } else {
-            request = new Request();
-            metadata = new RedmineIssueMetadata();
-            metadata.setRedmineInstance(credential.getRedmineInstance());
+    private RestClient.RequestHeadersSpec<?> applyApiKey(RestClient.RequestHeadersSpec<?> spec, String apiKey) {
+        if (apiKey != null && !apiKey.isBlank()) {
+            return spec.header("X-Redmine-API-Key", apiKey);
         }
-
-        redmineIssueMapper.updateEntityAndMetadataFromDto(dto, request, metadata);
-
-        request = requestRepository.save(request);
-        metadata.setRequest(request);
-        redmineIssueMetadataRepository.save(metadata);
+        return spec;
     }
 }

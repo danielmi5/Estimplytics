@@ -20,6 +20,24 @@ export const routes: Routes = [
 		title: 'Login'
 	},
 	{
+		path: 'configuration',
+		loadComponent: () => import('./pages/configuration/configuration').then((m) => m.ConfigurationPage),
+		canActivate: [authGuard],
+		title: 'Configuración'
+	},
+	{
+		path: 'requests',
+		loadComponent: () => import('./pages/requests/requests').then((m) => m.RequestsPage),
+		canActivate: [authGuard],
+		title: 'Peticiones'
+	},
+	{
+		path: 'analysis',
+		loadComponent: () => import('./pages/analysis/analysis').then((m) => m.AnalysisPage),
+		canActivate: [authGuard],
+		title: 'Análisis'
+	},
+	{
 		path: 'home',
 		redirectTo: '',
 		pathMatch: 'full'

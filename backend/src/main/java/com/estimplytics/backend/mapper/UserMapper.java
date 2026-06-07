@@ -40,7 +40,7 @@ public class UserMapper implements IMapper<User, UserRequestDTO, UserResponseDTO
                 .name(requestDTO.getName())
                 .email(requestDTO.getEmail())
                 .password(passwordEncoder.encode(requestDTO.getPassword()))
-                .role(requestDTO.getRole() != null ? Role.valueOf(requestDTO.getRole()) : null)
+                .role(requestDTO.getRole() != null ? Role.valueOf(requestDTO.getRole()) : Role.ANALYST)
                 .build();
     }
 
@@ -57,9 +57,6 @@ public class UserMapper implements IMapper<User, UserRequestDTO, UserResponseDTO
         }
         if (updateDTO.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(updateDTO.getPassword()));
-        }
-        if (updateDTO.getRole() != null) {
-            user.setRole(Role.valueOf(updateDTO.getRole()));
         }
     }
 }

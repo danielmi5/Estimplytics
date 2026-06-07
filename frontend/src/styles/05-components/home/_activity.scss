@@ -14,11 +14,8 @@
     }
 
     &__title {
-        margin: 0;
-        color: var(--text);
-        font-family: var(--font-secondary);
+        @include mixins.typography(h3);
         font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-        font-weight: var(--font-weight-700);
     }
 
     &__subtitle {
@@ -44,6 +41,15 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: var(--spacing-lg);
+    }
+
+    &__empty {
+        margin: 0;
+        padding: var(--spacing-xl);
+        border: 1px dashed var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--card-label);
+        text-align: center;
     }
 
     @media (max-width: $breakpoint-md) {
