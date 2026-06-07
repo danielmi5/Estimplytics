@@ -10,9 +10,8 @@ describe('Welcome', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Welcome],
-      providers: [provideRouter([])]
-    })
-    .compileComponents();
+      providers: [provideRouter([])],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Welcome);
     component = fixture.componentInstance;

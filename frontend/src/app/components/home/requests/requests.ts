@@ -7,6 +7,7 @@ import { DataTable } from '../../shared/data-table/data-table';
 import { FeatherIconDirective } from '../../../directives/feather-icon.directive';
 import { RequestsApiService } from '../../../core/requests/requests-api.service';
 import { RequestResponse } from '../../../core/requests/request.dto';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-requests',
@@ -16,12 +17,28 @@ import { RequestResponse } from '../../../core/requests/request.dto';
 })
 export class Requests {
   private readonly api = inject(RequestsApiService);
+  private readonly auth = inject(AuthService);
 
   readonly requests = signal<RequestResponse[]>([]);
+  readonly loadError = signal(false);
 
   constructor() {
-    this.api.getAll({ page: 0, size: 5, sort: 'createdDate,desc' }).subscribe({
-      next: (page) => this.requests.set(page.content)
+    if (!this.auth.isAuthenticated()) {
+      return;
+    }
+
+    this.api.getAll({ page: 0, size: 50, sort: 'createdDate,desc' }).subscribe({
+      next: (page) => {
+        const pending = page.content
+          .filter((request) => request.status?.toUpperCase() !== 'CLOSED')
+          .slice(0, 5);
+        this.requests.set(pending);
+        this.loadError.set(false);
+      },
+      error: () => {
+        this.requests.set([]);
+        this.loadError.set(true);
+      }
     });
   }
 

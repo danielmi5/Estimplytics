@@ -36,6 +36,15 @@
         }
     }
 
+    &__empty {
+        margin: 0;
+        padding: var(--spacing-xl);
+        border: 1px dashed var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--card-label);
+        text-align: center;
+    }
+
     &__priority {
         @include mixins.typography(mini);
         font-weight: var(--font-weight-700);

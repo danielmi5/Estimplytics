@@ -43,6 +43,15 @@
         gap: var(--spacing-lg);
     }
 
+    &__empty {
+        margin: 0;
+        padding: var(--spacing-xl);
+        border: 1px dashed var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--card-label);
+        text-align: center;
+    }
+
     @media (max-width: $breakpoint-md) {
         &__header {
             align-items: flex-start;

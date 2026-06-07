@@ -14,25 +14,16 @@
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: var(--spacing-lg);
-        margin-bottom: var(--spacing-2xl);
-    }
-
-    &__summary {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--spacing-lg);
     }
 
     @media (max-width: $breakpoint-lg) {
-        &__grid,
-        &__summary {
+        &__grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
     @media (max-width: $breakpoint-md) {
-        &__grid,
-        &__summary {
+        &__grid {
             grid-template-columns: 1fr;
         }
     }

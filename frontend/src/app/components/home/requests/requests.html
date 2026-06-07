@@ -13,40 +13,46 @@
       <p class="requests__subtitle">Sincronizadas desde Redmine</p>
     </header>
 
-    <app-data-table>
-      <thead>
-        <tr>
-          <th>Ticket ID</th>
-          <th>Título</th>
-          <th>Fuente</th>
-          <th>Fecha</th>
-          <th>Prioridad</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (request of requests(); track request.id) {
+    @if (loadError()) {
+      <p class="requests__empty">No se pudieron cargar las peticiones. Inicia sesión para ver los datos.</p>
+    } @else if (requests().length === 0) {
+      <p class="requests__empty">No hay peticiones pendientes.</p>
+    } @else {
+      <app-data-table>
+        <thead>
           <tr>
-            <td><span class="data-table__ticket">{{ request.originRequestCode ?? request.id }}</span></td>
-            <td class="data-table__cell-title">{{ request.title }}</td>
-            <td><span class="data-table__project">{{ sourceLabel(request) }}</span></td>
-            <td class="data-table__date">{{ request.createdDate | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <app-badge [baseClass]="'requests__priority'" [tone]="priorityTone(request)">
-                {{ request.priority | titlecase }}
-              </app-badge>
-            </td>
-            <td>
-              <app-button
-                variant="secondary"
-                size="sm"
-                label="Iniciar análisis"
-                [routerLink]="['/analysis', request.id]">
-              </app-button>
-            </td>
+            <th>Ticket ID</th>
+            <th>Título</th>
+            <th>Fuente</th>
+            <th>Fecha</th>
+            <th>Prioridad</th>
+            <th>Acción</th>
           </tr>
-        }
-      </tbody>
-    </app-data-table>
+        </thead>
+        <tbody>
+          @for (request of requests(); track request.id) {
+            <tr>
+              <td><span class="data-table__ticket">{{ request.originRequestCode ?? request.id }}</span></td>
+              <td class="data-table__cell-title">{{ request.title }}</td>
+              <td><span class="data-table__project">{{ sourceLabel(request) }}</span></td>
+              <td class="data-table__date">{{ request.createdDate | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <app-badge [baseClass]="'requests__priority'" [tone]="priorityTone(request)">
+                  {{ request.priority | titlecase }}
+                </app-badge>
+              </td>
+              <td>
+                <app-button
+                  variant="secondary"
+                  size="sm"
+                  label="Iniciar análisis"
+                  [routerLink]="['/analysis', request.id]">
+                </app-button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </app-data-table>
+    }
   </section>
 </section>
