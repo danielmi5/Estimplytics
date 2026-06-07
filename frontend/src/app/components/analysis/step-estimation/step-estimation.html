@@ -1,0 +1,116 @@
+<div class="step-section">
+  <article
+    class="step-card"
+    [class.step-card--completed]="state() === 'completed'"
+    [class.step-card--active]="state() === 'active'"
+    [class.step-card--inactive]="state() === 'inactive'"
+  >
+    @if (state() !== 'completed') {
+      <header class="step-card__header">
+        <span
+          class="step-card__badge"
+          [class.step-card__badge--success]="state() === 'completed'"
+          [class.step-card__badge--active]="state() === 'active'"
+          [class.step-card__badge--inactive]="state() === 'inactive'"
+          aria-hidden="true"
+        >3</span>
+        <h2 class="step-card__title">Motor de Estimación</h2>
+      </header>
+    }
+
+    @if (state() === 'active') {
+      <div class="step-card__body step-estimation">
+        @if (isLoading()) {
+          <p class="step-estimation__empty">Cargando estimación...</p>
+        } @else {
+          <div class="step-estimation__layout">
+            <div class="step-estimation__circle-wrap">
+              <div class="step-estimation__circle" [style]="circleStyle()" aria-hidden="true">
+                <div class="step-estimation__circle-inner">
+                  <span class="step-estimation__circle-value">{{ fiabilityPercent() }}%</span>
+                  <span class="step-estimation__circle-label">Fiabilidad</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-estimation__details">
+              <section class="step-estimation__suggested" aria-label="Estimación sugerida">
+                <p class="step-estimation__suggested-label">Estimación sugerida</p>
+                <p class="step-estimation__suggested-value">{{ suggestedTotalHours() }} Horas</p>
+                @if (similarRequestsCount() > 0) {
+                  <p class="step-estimation__suggested-hint">
+                    Basado en {{ similarRequestsCount() }}
+                    {{ similarRequestsCount() === 1 ? 'petición similar' : 'peticiones similares' }}
+                  </p>
+                }
+              </section>
+
+              <section class="step-estimation__breakdown" aria-label="Desglose de horas">
+                <div class="step-estimation__breakdown-header">
+                  <h3 class="step-estimation__list-heading">Horas</h3>
+                  <h3 class="step-estimation__list-heading">Ajuste manual</h3>
+                </div>
+
+                <ul class="step-estimation__breakdown-list">
+                  @for (type of hourTypes; track type) {
+                    <li class="step-estimation__breakdown-row">
+                      <div class="step-estimation__hours">
+                        <span class="step-estimation__hours-type">{{ labelFor(type) }}</span>
+                        <span class="step-estimation__hours-value">{{ suggestedFor(type) }} h</span>
+                      </div>
+                      <div class="step-estimation__adjust">
+                        <div class="step-estimation__stepper">
+                          <button
+                            type="button"
+                            class="step-estimation__stepper-button"
+                            [attr.aria-label]="'Reducir ' + labelFor(type)"
+                            (click)="decrement(type)"
+                          >−</button>
+                          <span class="step-estimation__stepper-value">{{ manualFor(type) }} h</span>
+                          <button
+                            type="button"
+                            class="step-estimation__stepper-button"
+                            [attr.aria-label]="'Aumentar ' + labelFor(type)"
+                            (click)="increment(type)"
+                          >+</button>
+                        </div>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              </section>
+
+              <app-button
+                class="step-estimation__validate-button"
+                variant="secondary"
+                label="Validar estimación"
+                buttonType="button"
+                [fullWidth]="true"
+                [disabled]="isLoading() || isValidating()"
+                (pressed)="validate()"
+              />
+            </div>
+          </div>
+        }
+
+        @if (errorMessage()) {
+          <p class="step-estimation__empty step-estimation__error" role="alert">{{ errorMessage() }}</p>
+        }
+      </div>
+    }
+
+    @if (state() === 'completed' && approvedBreakdown()) {
+      <header class="step-card__header step-card__header--completed">
+        <span class="step-card__badge step-card__badge--success" aria-hidden="true">
+          <span [feather]="'check'"></span>
+        </span>
+        <h2 class="step-card__title">Paso 3: Motor de Estimación</h2>
+        <button type="button" class="step-card__edit" aria-label="Editar paso 3" (click)="onEdit()">
+          <span [feather]="'edit-2'" variant="botones"></span>
+        </button>
+      </header>
+
+      <p class="step-card__summary-text">{{ completedSummary() }}</p>
+    }
+  </article>
+</div>
