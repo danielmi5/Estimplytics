@@ -1,0 +1,45 @@
+<section class="dashboard-summary" aria-label="Resumen del dashboard">
+  @for (metric of metrics(); track metric.id; let last = $last) {
+    <article class="dashboard-summary__item">
+      <p class="dashboard-summary__label">{{ metric.label }}</p>
+
+      <p
+        class="dashboard-summary__value"
+        [class.dashboard-summary__value--category-1]="metric.tone === 'category-1'"
+        [class.dashboard-summary__value--category-2]="metric.tone === 'category-2'"
+        [class.dashboard-summary__value--category-3]="metric.tone === 'category-3'"
+        [class.dashboard-summary__value--category-4]="metric.tone === 'category-4'"
+      >
+        {{ metric.value }}
+      </p>
+
+      @if (metric.change) {
+        <p
+          class="dashboard-summary__change"
+          [class.dashboard-summary__change--positive]="metric.changeType === 'positive'"
+          [class.dashboard-summary__change--negative]="metric.changeType === 'negative'"
+          [class.dashboard-summary__change--neutral]="metric.changeType === 'neutral'"
+        >
+          {{ metric.change }}
+        </p>
+      }
+
+      @if (metric.progress != null) {
+        <div class="dashboard-summary__progress" aria-hidden="true">
+          <span
+            class="dashboard-summary__progress-fill"
+            [class.dashboard-summary__progress-fill--category-1]="metric.tone === 'category-1'"
+            [class.dashboard-summary__progress-fill--category-2]="metric.tone === 'category-2'"
+            [class.dashboard-summary__progress-fill--category-3]="metric.tone === 'category-3'"
+            [class.dashboard-summary__progress-fill--category-4]="metric.tone === 'category-4'"
+            [style.width.%]="metric.progress"
+          ></span>
+        </div>
+      }
+    </article>
+
+    @if (!last) {
+      <span class="dashboard-summary__divider" aria-hidden="true"></span>
+    }
+  }
+</section>
