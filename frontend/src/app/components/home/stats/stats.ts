@@ -9,5 +9,6 @@ import { StatMetric } from '../../../pages/home/home.models';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Stats {
+  readonly title = input('Métricas de la plataforma');
   readonly statMetrics = input.required<StatMetric[]>();
 }
