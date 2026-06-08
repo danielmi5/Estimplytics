@@ -1,0 +1,23 @@
+<div class="dashboard-page">
+  <app-sidebar></app-sidebar>
+
+  <section class="dashboard-page__content">
+    <header class="dashboard-page__header">
+      <h1 class="dashboard-page__title">Dashboard</h1>
+    </header>
+
+    <app-dashboard-summary [metrics]="summary()"></app-dashboard-summary>
+
+    <app-dashboard-charts
+      [lineChart]="lineChart()"
+      [circle]="circle()"
+    ></app-dashboard-charts>
+
+    <section class="dashboard-page__metrics">
+      <app-stats
+        title="Métricas en tiempo real"
+        [statMetrics]="statMetrics()"
+      ></app-stats>
+    </section>
+  </section>
+</div>
