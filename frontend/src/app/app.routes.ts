@@ -20,6 +20,12 @@ export const routes: Routes = [
 		title: 'Login'
 	},
 	{
+		path: 'dashboard',
+		loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.DashboardPage),
+		canActivate: [authGuard],
+		title: 'Dashboard'
+	},
+	{
 		path: 'configuration',
 		loadComponent: () => import('./pages/configuration/configuration').then((m) => m.ConfigurationPage),
 		canActivate: [authGuard],
