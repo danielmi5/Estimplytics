@@ -9,6 +9,10 @@
   @include mixins.flex(row, 0);
   align-items: stretch;
 
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+  }
+
   &__content {
     flex: 1;
     min-width: 0;
@@ -39,11 +43,22 @@
 
   &__search {
     max-width: 28rem;
+    width: 100%;
   }
 
   &__actions {
     @include mixins.flex(row, var(--spacing-md), flex-end, center);
     flex-wrap: wrap;
     margin-top: var(--spacing-xl);
+  }
+
+  @media (max-width: $breakpoint-md) {
+    &__actions {
+      justify-content: stretch;
+
+      app-button {
+        flex: 1 1 100%;
+      }
+    }
   }
 }

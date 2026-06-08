@@ -7,6 +7,7 @@ import { DataTable } from '../../shared/data-table/data-table';
 import { FeatherIconDirective } from '../../../directives/feather-icon.directive';
 import { RequestsApiService } from '../../../core/requests/requests-api.service';
 import { RequestResponse } from '../../../core/requests/request.dto';
+import { priorityTone } from '../../../core/requests/priority.util';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -46,15 +47,7 @@ export class Requests {
     return request.redmineId != null || request.originRequestCode?.startsWith('REDMINE-') ? 'Redmine' : 'Manual';
   }
 
-  priorityTone(request: RequestResponse): string {
-    switch (request.priority?.toLowerCase()) {
-      case 'high':
-      case 'urgent':
-        return 'high';
-      case 'low':
-        return 'low';
-      default:
-        return 'medium';
-    }
+  requestPriorityTone(request: RequestResponse): string {
+    return priorityTone(request.priority);
   }
 }

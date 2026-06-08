@@ -1,3 +1,4 @@
+@use '../../00-settings/variables' as *;
 @use '../../01-tools/mixins' as mixins;
 
 .app-main:has(.analysis) {
@@ -8,7 +9,7 @@
   @include mixins.flex(row, 0);
   align-items: stretch;
 
-  @media (max-width: 768px) {
+  @media (max-width: $breakpoint-md) {
     flex-direction: column;
   }
 
@@ -16,14 +17,13 @@
     flex: 1;
     min-width: 0;
     padding: var(--spacing-2xl) var(--spacing-3xl);
-
     @include mixins.flex(column, var(--spacing-xl));
 
-    @media (max-width: 1024px) {
+    @media (max-width: $breakpoint-lg) {
       padding-inline: var(--spacing-2xl);
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: $breakpoint-md) {
       padding: var(--spacing-lg) var(--spacing-md);
     }
   }

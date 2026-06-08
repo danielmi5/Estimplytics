@@ -40,9 +40,8 @@
 
   &__label {
     flex: 1;
+    white-space: nowrap;
   }
-
-  
 
   &:hover,
   &:focus-visible {
@@ -59,5 +58,19 @@
     background-color: var(--bg-subtle-hover);
     color: var(--text-important);
     font-weight: var(--font-weight-600);
+  }
+
+  @media (max-width: vars.$breakpoint-md) {
+    width: auto;
+    min-width: max-content;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-left: none;
+    border-bottom: 0.25rem solid transparent;
+    border-radius: var(--radius-md);
+
+    &--active {
+      border-left-color: transparent;
+      border-bottom-color: var(--text-important);
+    }
   }
 }

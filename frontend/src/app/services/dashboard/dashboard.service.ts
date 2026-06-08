@@ -15,6 +15,7 @@ import {
   LineChartPoint
 } from '../../pages/dashboard/dashboard.models';
 import { AuthService } from '../auth.service';
+import { isHighPriority } from '../../core/requests/priority.util';
 
 const PAGE = { page: 0, size: 200 } as const;
 const RESPONSE_TARGET_HOURS = 48;
@@ -102,8 +103,7 @@ export class DashboardService {
       : 0;
 
     const criticalOpen = requests.filter((request) =>
-      request.status?.toUpperCase() !== 'CLOSED'
-      && request.priority?.toUpperCase() === 'HIGH'
+      request.status?.toUpperCase() !== 'CLOSED' && isHighPriority(request.priority)
     ).length;
 
     const coverage = Math.round(pct(analysedRequestIds.size, requests.length));

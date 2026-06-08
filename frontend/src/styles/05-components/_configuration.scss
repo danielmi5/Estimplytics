@@ -9,11 +9,14 @@
   @include mixins.flex(row, 0);
   align-items: stretch;
 
+  @media (max-width: vars.$breakpoint-md) {
+    flex-direction: column;
+  }
+
   &__content {
     flex: 1;
     min-width: 0;
     padding: var(--spacing-2xl) var(--spacing-3xl);
-
     @include mixins.flex(column, var(--spacing-xl));
 
     @media (max-width: vars.$breakpoint-lg) {

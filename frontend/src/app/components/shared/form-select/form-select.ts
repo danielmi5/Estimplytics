@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  forwardRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FeatherIconDirective } from '../../../directives/feather-icon.directive';
 import type { ValidationState } from '../form-input/form-input';
@@ -23,6 +32,8 @@ export interface FormSelectOption {
   ],
 })
 export class FormSelect implements ControlValueAccessor {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   readonly id = input('');
   readonly name = input('');
   readonly label = input('');
@@ -39,8 +50,8 @@ export class FormSelect implements ControlValueAccessor {
 
   private readonly controlDisabled = signal(false);
   readonly isDisabled = computed(() => this.disabled() || this.controlDisabled());
+  readonly value = signal('');
 
-  value = '';
   onChange: (value: string) => void = () => {};
   onTouched: () => void = () => {};
 
@@ -56,8 +67,13 @@ export class FormSelect implements ControlValueAccessor {
     return 'chevron-down';
   }
 
-  writeValue(value: string): void {
-    this.value = value ?? '';
+  isSelected(optionValue: string): boolean {
+    return this.value() === optionValue;
+  }
+
+  writeValue(value: string | null): void {
+    this.value.set(value ?? '');
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -70,12 +86,14 @@ export class FormSelect implements ControlValueAccessor {
 
   setDisabledState(isDisabled: boolean): void {
     this.controlDisabled.set(isDisabled);
+    this.cdr.markForCheck();
   }
 
   onSelect(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.value = select.value;
-    this.onChange(this.value);
+    this.value.set(select.value);
+    this.onChange(select.value);
+    this.cdr.markForCheck();
   }
 
   onBlur(): void {

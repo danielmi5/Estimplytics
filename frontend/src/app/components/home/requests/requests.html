@@ -37,7 +37,7 @@
               <td><span class="data-table__project">{{ sourceLabel(request) }}</span></td>
               <td class="data-table__date">{{ request.createdDate | date: 'dd/MM/yyyy HH:mm' }}</td>
               <td>
-                <app-badge [baseClass]="'requests__priority'" [tone]="priorityTone(request)">
+                <app-badge [baseClass]="'requests__priority'" [tone]="requestPriorityTone(request)">
                   {{ request.priority | titlecase }}
                 </app-badge>
               </td>

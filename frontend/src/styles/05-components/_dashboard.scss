@@ -11,6 +11,10 @@
   @include mixins.flex(row, 0);
   align-items: stretch;
 
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+  }
+
   &__content {
     flex: 1;
     min-width: 0;

@@ -60,20 +60,22 @@ export class StepAnalysis {
   constructor() {
     effect(() => {
       const data = this.summary();
-      if (data) {
-        this.form.patchValue(
-          {
-            descripcionAbreviada: data.descripcionAbreviada,
-            descripcionImpacto: data.descripcionImpacto,
-            descripcionSolucion: data.descripcionSolucion,
-            requisitosFuncionales: data.requisitosFuncionales,
-            pruebas: data.pruebas,
-            complexity: data.complexity,
-            versionNumber: data.versionNumber,
-          },
-          { emitEvent: false }
-        );
+      if (!data || this.state() === 'active') {
+        return;
       }
+
+      this.form.patchValue(
+        {
+          descripcionAbreviada: data.descripcionAbreviada,
+          descripcionImpacto: data.descripcionImpacto,
+          descripcionSolucion: data.descripcionSolucion,
+          requisitosFuncionales: data.requisitosFuncionales,
+          pruebas: data.pruebas,
+          complexity: data.complexity,
+          versionNumber: data.versionNumber,
+        },
+        { emitEvent: false }
+      );
     });
   }
 

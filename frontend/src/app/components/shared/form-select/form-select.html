@@ -18,7 +18,6 @@
       [id]="id()"
       [name]="name()"
       [disabled]="isDisabled()"
-      [value]="value"
       (change)="onSelect($event)"
       (blur)="onBlur()"
       [attr.aria-disabled]="isDisabled() ? 'true' : null"
@@ -31,7 +30,7 @@
         <option value="" disabled>{{ placeholder() }}</option>
       }
       @for (option of options(); track option.value) {
-        <option [value]="option.value">{{ option.label }}</option>
+        <option [value]="option.value" [selected]="isSelected(option.value)">{{ option.label }}</option>
       }
     </select>
 
