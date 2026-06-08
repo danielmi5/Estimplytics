@@ -1,0 +1,149 @@
+@use "../../00-settings/variables" as *;
+@use "../../01-tools/mixins" as mixins;
+@use "./summary" as summary;
+
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--spacing-lg);
+
+  &__panel {
+    @include summary.dashboard-panel;
+    padding: var(--spacing-xl);
+    @include mixins.flex(column, var(--spacing-lg), flex-start, stretch);
+
+    &--line {
+      min-height: 18rem;
+    }
+
+    &--circle {
+      min-height: 18rem;
+    }
+  }
+
+  &__header {
+    @include mixins.flex(row, var(--spacing-sm), space-between, center);
+  }
+
+  &__title {
+    @include mixins.typography(h2);
+  }
+
+  &__line {
+    @include mixins.flex(column, var(--spacing-md), flex-start, stretch);
+    flex: 1;
+    min-height: 12rem;
+  }
+
+  &__line-chart {
+    width: 100%;
+    height: 12rem;
+  }
+
+  &__axis {
+    stroke: var(--border);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+
+    &--horizontal {
+      opacity: 0.5;
+    }
+
+    &--vertical {
+      opacity: 0.35;
+    }
+  }
+
+  &__series {
+    fill: none;
+    stroke: var(--color-primary-base);
+    stroke-width: 2.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  &__trend {
+    fill: none;
+    stroke: var(--color-neutral-3);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+    vector-effect: non-scaling-stroke;
+  }
+
+  &__point {
+    fill: var(--color-primary-base);
+    stroke: var(--bg-cards);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  &__line-labels {
+    @include mixins.flex(row, var(--spacing-md), space-between, center);
+  }
+
+  &__line-label {
+    @include mixins.typography(small, var(--card-label));
+    font-weight: var(--font-weight-600);
+  }
+
+  &__circle {
+    @include mixins.flex(column, var(--spacing-lg), center, center);
+    flex: 1;
+  }
+
+  &__circle-ring {
+    width: 10.5rem;
+    height: 10.5rem;
+    border-radius: var(--radius-full);
+    @include mixins.flex-center();
+  }
+
+  &__circle-center {
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: var(--radius-full);
+    background: var(--bg-cards);
+    @include mixins.flex(column, var(--spacing-xs), center, center);
+  }
+
+  &__circle-value {
+    @include mixins.typography(h5);
+  }
+
+  &__circle-caption {
+    @include mixins.typography(small, var(--card-label));
+    font-weight: var(--font-weight-600);
+  }
+
+  &__legend {
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    @include mixins.flex(column, var(--spacing-sm), flex-start, stretch);
+  }
+
+  &__legend-item {
+    @include mixins.flex(row, var(--spacing-sm), flex-start, center);
+  }
+
+  &__legend-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+  }
+
+  &__legend-label {
+    flex: 1;
+    @include mixins.typography(small, var(--card-label));
+  }
+
+  &__legend-value {
+    @include mixins.typography(small);
+    font-weight: var(--font-weight-700);
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: 1fr;
+  }
+}
