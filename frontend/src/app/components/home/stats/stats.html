@@ -1,6 +1,6 @@
 <section class="stats">
   <section class="o-container--section">
-    <h2 class="stats__title">Métricas de la plataforma</h2>
+    <h2 class="stats__title">{{ title() }}</h2>
 
     <section class="stats__grid">
       @for (stat of statMetrics(); track stat.id) {

@@ -1,0 +1,56 @@
+@use "../00-settings/variables" as *;
+@use "../01-tools/mixins" as mixins;
+@use "./dashboard/summary";
+@use "./dashboard/charts";
+
+.app-main:has(.dashboard-page) {
+  min-height: auto;
+}
+
+.dashboard-page {
+  @include mixins.flex(row, 0);
+  align-items: stretch;
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    padding: var(--spacing-2xl) var(--spacing-3xl);
+    @include mixins.flex(column, var(--spacing-xl));
+
+    @media (max-width: $breakpoint-lg) {
+      padding-inline: var(--spacing-2xl);
+    }
+
+    @media (max-width: $breakpoint-md) {
+      padding-inline: var(--spacing-md);
+    }
+  }
+
+  &__header {
+    @include mixins.flex(column, var(--spacing-xs), center, center);
+  }
+
+  &__title {
+    margin: 0;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    @include mixins.typography(h1);
+  }
+
+  &__metrics {
+    .stats {
+      padding: 0;
+    }
+
+    .stats__title {
+      text-align: left;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+    }
+
+    .stat-card {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}

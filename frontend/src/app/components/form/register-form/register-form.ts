@@ -73,7 +73,7 @@ export class RegisterForm {
 				this.appState.setLoading(false);
 				this.notificationService.success('Cuenta creada. ¡Bienvenido!');
 				const redirect = this.route.snapshot.queryParamMap.get('returnUrl');
-				const safeRedirect = redirect?.startsWith('/') ? redirect : '/';
+				const safeRedirect = redirect?.startsWith('/') ? redirect : '/dashboard';
 				void this.router.navigateByUrl(safeRedirect);
 			},
 			error: () => {

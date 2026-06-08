@@ -1,0 +1,85 @@
+<section class="dashboard-charts" aria-label="Gráficos del dashboard">
+  <article class="dashboard-charts__panel dashboard-charts__panel--line">
+    <header class="dashboard-charts__header">
+      <h2 class="dashboard-charts__title">Escala de peticiones analizadas</h2>
+    </header>
+
+    <div class="dashboard-charts__line">
+      <svg
+        class="dashboard-charts__line-chart"
+        viewBox="0 0 280 120"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="Gráfico de evolución de peticiones analizadas"
+      >
+        <line
+          class="dashboard-charts__axis dashboard-charts__axis--horizontal"
+          x1="0"
+          y1="120"
+          x2="280"
+          y2="120"
+        />
+        <line
+          class="dashboard-charts__axis dashboard-charts__axis--vertical"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="120"
+        />
+
+        <polyline class="dashboard-charts__trend" [attr.points]="trendPoints()" />
+        <polyline class="dashboard-charts__series" [attr.points]="linePoints()" />
+
+        @for (marker of chartMarkers(); track marker.label) {
+          <circle
+            class="dashboard-charts__point"
+            [attr.cx]="marker.cx"
+            [attr.cy]="marker.cy"
+            r="4"
+          />
+        }
+      </svg>
+
+      <div class="dashboard-charts__line-labels">
+        @for (marker of chartMarkers(); track marker.label) {
+          <span class="dashboard-charts__line-label">{{ marker.label }}</span>
+        }
+      </div>
+    </div>
+  </article>
+
+  <article class="dashboard-charts__panel dashboard-charts__panel--circle">
+    <header class="dashboard-charts__header">
+      <h2 class="dashboard-charts__title">Estado de las peticiones</h2>
+    </header>
+
+    <div class="dashboard-charts__circle">
+      <div
+        class="dashboard-charts__circle-ring"
+        [style.background]="'conic-gradient(' + circleGradient() + ')'"
+        role="img"
+        [attr.aria-label]="circleAriaLabel()"
+      >
+        <div class="dashboard-charts__circle-center">
+          <strong class="dashboard-charts__circle-value">{{ circle().completionRate }}%</strong>
+          <span class="dashboard-charts__circle-caption">Completado</span>
+        </div>
+      </div>
+
+      <ul class="dashboard-charts__legend">
+        @for (segment of circle().segments; track segment.id) {
+          <li class="dashboard-charts__legend-item">
+            <span
+              class="dashboard-charts__legend-dot"
+              [style.background]="segment.color"
+            ></span>
+            <span class="dashboard-charts__legend-label">{{ segment.label }}</span>
+            <strong class="dashboard-charts__legend-value">
+              {{ segment.value | number: '1.0-0' }}
+            </strong>
+          </li>
+        }
+      </ul>
+    </div>
+  </article>
+</section>
